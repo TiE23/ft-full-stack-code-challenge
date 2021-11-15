@@ -1,0 +1,7 @@
+{
+  "version": 2,
+  "projects": {
+    "kanban-backend": "apps/kanban-backend",
+    "kanban-fe": "apps/kanban-fe"
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "root": "apps/kanban-fe",
+  "sourceRoot": "apps/kanban-fe/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/web:build",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "dist/apps/kanban-fe",
+        "index": "apps/kanban-fe/src/index.html",
+        "baseHref": "/",
+        "main": "apps/kanban-fe/src/main.tsx",
+        "polyfills": "apps/kanban-fe/src/polyfills.ts",
+        "tsConfig": "apps/kanban-fe/tsconfig.app.json",
+        "assets": [
+          "apps/kanban-fe/src/favicon.ico"
+        ],
+        "styles": ["apps/kanban-fe/src/styles.css"],
+        "scripts": [],
+        "webpackConfig": "@nrwl/react/plugins/webpack"
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "outputHashing": "all",
+          "sourceMap": false,
+          "namedChunks": false,
+          "extractLicenses": true,
+          "vendorChunk": false
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nrwl/web:dev-server",
+      "options": {
+        "buildTarget": "kanban-fe:build",
+        "hmr": true
+      },
+      "configurations": {
+        "production": {
+          "buildTarget": "kanban-fe:build:production",
+          "hmr": false
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/kanban-fe/**/*.{ts,tsx,js,jsx}"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/apps/kanban-fe"],
+      "options": {
+        "jestConfig": "apps/kanban-fe/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}
