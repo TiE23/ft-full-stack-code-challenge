@@ -44,7 +44,7 @@ Feel free to use the Nest CLI to generate new resources.
 ### Commands
 
 - Start frontend: `yarn start:fe`
-- Start backend: `yarn start:fe`
+- Start backend: `yarn start:be`
 - Run both in a single termina: `yarn start`
 
 ### Functionality Requirements:
