@@ -18,7 +18,7 @@ export class Category {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, unique: true })
   title: string;
 
   @OneToMany(() => Task, (task) => task.category, {

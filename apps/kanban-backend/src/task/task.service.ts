@@ -77,8 +77,10 @@ export class TaskService {
     // Update the Task. The Cascade option for the Relation will handle the rest.
     await this.tasksRepository.update({ id: taskId }, targetTask);
 
-    // Return the updated Task.
-    return targetTask;
+    // Return the newly updated Task so that we can get updated Category relation.
+    return await this.tasksRepository.findOne(targetTask.id, {
+      relations: ['category'],
+    });
   }
 
   async remove(id: number) {

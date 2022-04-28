@@ -27,25 +27,25 @@ export class TaskController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.taskService.findOne(+id);
+  findOne(@Param('id') id: number) {
+    return this.taskService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
-    return this.taskService.update(+id, updateTaskDto);
+  update(@Param('id') id: number, @Body() updateTaskDto: UpdateTaskDto) {
+    return this.taskService.update(id, updateTaskDto);
   }
 
   @Patch(':taskId/moveto/:categoryId')
   move(
-    @Param('taskId') taskId: string,
-    @Param('categoryId') categoryId: string
+    @Param('taskId') taskId: number,
+    @Param('categoryId') categoryId: number
   ) {
-    return this.taskService.move(+taskId, +categoryId);
+    return this.taskService.move(taskId, categoryId);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.taskService.remove(+id);
+  remove(@Param('id') id: number) {
+    return this.taskService.remove(id);
   }
 }
