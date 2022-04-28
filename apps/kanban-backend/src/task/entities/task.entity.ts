@@ -3,7 +3,6 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -15,15 +14,19 @@ export class Task {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: false })
   title: string;
 
-  @ManyToOne(() => Category, (category) => category.tasks)
+  @ManyToOne(() => Category, (category) => category.tasks, {
+    onDelete: 'CASCADE', // Automatically delete Task when Category is deleted.
+    cascade: ['update'], // Automatically update categories when adding new task.
+    nullable: false, // A Task will always belong to a category.
+  })
   category: Category;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ nullable: false })
   created_at: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ nullable: false })
   updated_at: Date;
 }

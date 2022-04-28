@@ -14,7 +14,9 @@ export class CategoryService {
   ) {}
 
   async create(createCategoryDto: CreateCategoryDto) {
-    return await this.categoriesRepository.save(createCategoryDto);
+    return await this.categoriesRepository.save(createCategoryDto, {
+      reload: true,
+    });
   }
 
   async findAll() {
@@ -38,10 +40,6 @@ export class CategoryService {
   }
 
   async remove(id: number) {
-    const categoryToDelete = await this.categoriesRepository.findOne({
-      where: { id },
-      relations: ['tasks'],
-    });
-    return await this.categoriesRepository.remove(categoryToDelete);
+    return await this.categoriesRepository.delete(id);
   }
 }

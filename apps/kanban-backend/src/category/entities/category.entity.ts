@@ -18,17 +18,17 @@ export class Category {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: false })
   title: string;
 
   @OneToMany(() => Task, (task) => task.category, {
-    orphanedRowAction: 'delete', // Delete tasks when the category is deleted.
+    nullable: false,
   })
   tasks: Task[];
 
-  @CreateDateColumn()
+  @CreateDateColumn({ nullable: false })
   created_at: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ nullable: false })
   updated_at: Date;
 }
