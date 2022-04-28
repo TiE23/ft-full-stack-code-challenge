@@ -19,8 +19,8 @@ export class Task {
 
   @ManyToOne(() => Category, (category) => category.tasks, {
     onDelete: 'CASCADE', // Automatically delete Task when Category is deleted.
-    cascade: ['update'], // Automatically update categories when adding new task.
-    nullable: false, // A Task will always belong to a category.
+    cascade: ['update'], // Automatically update Category when adding new Task.
+    nullable: false, // A Task will always belong to a Category.
   })
   category: Category;
 

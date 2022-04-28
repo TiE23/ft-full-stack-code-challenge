@@ -27,7 +27,12 @@ export class TaskService {
     newTask.category = insertCategory;
 
     // Cascade rule will take care of the update to Category for us.
-    return await this.tasksRepository.save(newTask);
+    const savedTask = await this.tasksRepository.save(newTask);
+
+    // Return the newly saved Task so that we can get updated Category relation.
+    return await this.tasksRepository.findOne(savedTask.id, {
+      relations: ['category'],
+    });
   }
 
   async findAll() {

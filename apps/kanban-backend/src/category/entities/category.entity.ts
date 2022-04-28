@@ -23,6 +23,7 @@ export class Category {
 
   @OneToMany(() => Task, (task) => task.category, {
     nullable: false,
+    eager: true, // Want to always return tasks when loading Category entities.
   })
   tasks: Task[];
 
