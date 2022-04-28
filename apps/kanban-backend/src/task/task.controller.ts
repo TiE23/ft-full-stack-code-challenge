@@ -36,6 +36,14 @@ export class TaskController {
     return this.taskService.update(+id, updateTaskDto);
   }
 
+  @Patch(':taskId/moveto/:categoryId')
+  move(
+    @Param('taskId') taskId: string,
+    @Param('categoryId') categoryId: string
+  ) {
+    return this.taskService.move(+taskId, +categoryId);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.taskService.remove(+id);

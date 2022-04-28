@@ -51,11 +51,36 @@ export class TaskService {
     });
   }
 
+  async move(taskId: number, categoryId: number) {
+    // Get the Task by its ID. Also retrieve its relation to Category, we'll need it.
+    const targetTask = await this.tasksRepository.findOne({
+      where: { id: taskId },
+      relations: ['category'],
+    });
+
+    // Borrow the old Category.
+    const oldCategory = targetTask.category;
+    if (categoryId === oldCategory.id) {
+      // No need. The Task won't move anywhere!
+      return targetTask;
+    }
+
+    // Find the Category we want to move to and give it to our Task object.
+    const moveToCategory = await this.categoriesService.findOne(categoryId);
+    targetTask.category = moveToCategory;
+
+    // Update the Task. The Cascade option for the Relation will handle the rest.
+    await this.tasksRepository.update({ id: taskId }, targetTask);
+
+    // Return the updated Task.
+    return targetTask;
+  }
+
   async remove(id: number) {
     const taskToDelete = await this.tasksRepository.findOne({
       where: { id },
       relations: ['category'],
     });
-    return await this.tasksRepository.remove(taskToDelete);
+    return await this.tasksRepository.delete(id);
   }
 }
