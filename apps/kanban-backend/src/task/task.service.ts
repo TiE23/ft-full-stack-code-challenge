@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -20,6 +20,12 @@ export class TaskService {
     const insertCategory = await this.categoriesService.findOne(
       createTaskDto.categoryId
     );
+
+    if (!insertCategory) {
+      throw new NotFoundException({
+        message: `Category ID: ${createTaskDto.categoryId} was not found`,
+      });
+    }
 
     // Build the new Task, providing the Category we found.
     const newTask = new Task();
@@ -49,6 +55,16 @@ export class TaskService {
   }
 
   async update(id: number, updateTaskDto: UpdateTaskDto) {
+    const targetTask = await this.tasksRepository.findOne({
+      where: { id },
+    });
+
+    if (!targetTask) {
+      throw new NotFoundException({
+        message: `Task with ID ${id} was not found`,
+      });
+    }
+
     await this.tasksRepository.update({ id }, updateTaskDto);
     return await this.tasksRepository.findOne({
       where: { id },
@@ -63,6 +79,12 @@ export class TaskService {
       relations: ['category'],
     });
 
+    if (!targetTask) {
+      throw new NotFoundException({
+        message: `Task with ID ${taskId} was not found`,
+      });
+    }
+
     // Borrow the old Category.
     const oldCategory = targetTask.category;
     if (categoryId === oldCategory.id) {
@@ -72,6 +94,13 @@ export class TaskService {
 
     // Find the Category we want to move to and give it to our Task object.
     const moveToCategory = await this.categoriesService.findOne(categoryId);
+
+    if (!moveToCategory) {
+      throw new NotFoundException({
+        message: `Category with ID ${categoryId} was not found`,
+      });
+    }
+
     targetTask.category = moveToCategory;
 
     // Update the Task. The Cascade option for the Relation will handle the rest.
@@ -84,10 +113,6 @@ export class TaskService {
   }
 
   async remove(id: number) {
-    const taskToDelete = await this.tasksRepository.findOne({
-      where: { id },
-      relations: ['category'],
-    });
     return await this.tasksRepository.delete(id);
   }
 }

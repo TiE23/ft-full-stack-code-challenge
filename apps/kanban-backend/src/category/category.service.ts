@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -31,7 +31,16 @@ export class CategoryService {
   }
 
   async update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    this.categoriesRepository.createQueryBuilder();
+    const targetCategory = await this.categoriesRepository.findOne({
+      where: { id },
+    });
+
+    if (!targetCategory) {
+      throw new NotFoundException({
+        message: `Category with ID ${id} was not found`,
+      });
+    }
+
     await this.categoriesRepository.update({ id }, updateCategoryDto);
     return await this.categoriesRepository.findOne({
       where: { id },
