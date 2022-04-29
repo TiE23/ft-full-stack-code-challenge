@@ -1,4 +1,5 @@
 import { LexicalOrder } from '../types/entity.types';
+import { SortDirection } from '../types/utils.types';
 
 /**
  * This is adapted from a solution shared on StackOverflow.
@@ -47,7 +48,7 @@ import { LexicalOrder } from '../types/entity.types';
  * @param prev
  * @param next
  */
-export function insertLexicalSort(prev: string, next: string): string {
+export function findLexicalPosition(prev: string, next: string): LexicalOrder {
   let pos = 0;
   let p = 0;
   let n = 0;
@@ -130,9 +131,9 @@ interface SortableEntity {
  */
 export function lexicallySortEntities<T extends SortableEntity>(
   entities: T[],
-  order: 'ASC' | 'DESC'
+  sortDireciton: SortDirection
 ): T[] {
-  const flip = order === 'ASC' ? 1 : -1; // Flipping the order.
+  const flip = sortDireciton === 'ASC' ? 1 : -1; // Flipping the sort.
   return Array.from(entities).sort(
     ({ lexical_order: a }: T, { lexical_order: b }: T) =>
       (a > b ? 1 : a < b ? -1 : 0) * flip
@@ -143,8 +144,8 @@ export function lexicallySortEntities<T extends SortableEntity>(
  * Given the entity's ID and the position you want to position it into this will
  * return what lexical order string it should get to sort in the correct slot
  * within the provided sorted Entities.
- * @param sortedEntities the SORTED array of sibling Entities
- * @param id the id of the entity you're trying to position
+ * @param sortedEntities the ASCENDING SORTED array of sibling Entities
+ * @param id the id of the entity you're trying to position. Set to -1 if there isn't none.
  * @param position if set to a negative number it will place it at the end
  * @returns the new lexical_order the entity should use.
  */
@@ -202,5 +203,5 @@ export function positionEntity<T extends SortableEntity>(
     nextLex = sortedEntities[newPosition].lexical_order;
   }
 
-  return insertLexicalSort(prevLex, nextLex);
+  return findLexicalPosition(prevLex, nextLex);
 }

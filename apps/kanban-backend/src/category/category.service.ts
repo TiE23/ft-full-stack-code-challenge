@@ -9,8 +9,12 @@ import { Task } from '../task/entities/task.entity';
 import { CreateTaskDto } from '../task/dto/create-task.dto';
 
 import { EntityNotFoundException } from '../exceptions/EntityNotFoundException';
-import { insertLexicalSort, positionEntity } from '../utils/common.utils';
-import { lexicallySortEntities } from '../utils/common.utils';
+import {
+  findLexicalPosition,
+  positionEntity,
+  lexicallySortEntities,
+} from '../utils/common.utils';
+import { sortTasksInCategory } from '../utils/category.utils';
 
 @Injectable()
 export class CategoryService {
@@ -21,7 +25,7 @@ export class CategoryService {
 
   /**
    * Creates a new Category with no Tasks and a lexical_order property that will
-   * make it sort to the end.
+   * make it sort to the end of all other Categories.
    * @param createCategoryDto
    * @returns
    */
@@ -33,8 +37,8 @@ export class CategoryService {
     });
     const lexicalOrder =
       categories.length > 0
-        ? insertLexicalSort(categories[0].lexical_order, '')
-        : insertLexicalSort('', '');
+        ? findLexicalPosition(categories[0].lexical_order, '')
+        : findLexicalPosition('', '');
 
     return await this.categoriesRepository.save({
       ...createCategoryDto,
@@ -43,17 +47,25 @@ export class CategoryService {
   }
 
   /**
-   * Returns all Categories and their Tasks.
-   * @returns
+   * Finds all Categories.
+   * @returnsall the Categories and their Tasks all sorted by lexical_order
    */
   async findAll() {
-    return await this.categoriesRepository.find({ relations: ['tasks'] });
+    const categories = await this.categoriesRepository.find({
+      relations: ['tasks'],
+      order: { lexical_order: 'ASC' },
+    });
+
+    // Sort Category's Tasks before returning.
+    categories.forEach((category) => sortTasksInCategory(category, 'ASC'));
+    return categories;
   }
 
   /**
-   * Returns one Category and its Tasks. If not found, it'll throw.
+   * Finds one Category by ID.
+   * If not found, it'll throw.
    * @param id
-   * @returns
+   * @returns the Category and its Tasks all sorted by lexical_order
    */
   async findOne(id: number): Promise<Category> {
     const category = await this.categoriesRepository.findOne({
@@ -65,15 +77,17 @@ export class CategoryService {
       throw new EntityNotFoundException('Category', id);
     }
 
+    // Sort Category's Tasks before returning.
+    sortTasksInCategory(category, 'ASC');
     return category;
   }
 
   /**
-   * Updates a Category. Will not create a Category if the ID isn't found, it'll
-   * throw instead. (Use with PATCH, not PUT).
+   * Updates a Category.
+   * Will not create a Category if the ID isn't found, it'll throw instead.
    * @param id
    * @param updateCategoryDto
-   * @returns
+   * @returns the Category with Tasks sorted by lexical_order
    */
   async update(
     id: number,
@@ -87,11 +101,15 @@ export class CategoryService {
       throw new EntityNotFoundException('Category', id);
     }
 
-    await this.categoriesRepository.update({ id }, updateCategoryDto);
-    return await this.categoriesRepository.findOne({
-      where: { id },
-      relations: ['tasks'],
+    // Save the Category.
+    const updatedCategory = await this.categoriesRepository.save({
+      ...targetCategory,
+      ...updateCategoryDto,
     });
+
+    // Sort Category's Tasks before returning.
+    sortTasksInCategory(updatedCategory, 'ASC');
+    return updatedCategory;
   }
 
   /**
@@ -99,12 +117,11 @@ export class CategoryService {
    * siblings through their lexical_order properties.
    * @param id
    * @param newPosition
-   * @returns
+   * @returns the Category with Tasks sorted by lexical_order
    */
   async reposition(id: number, newPosition: number): Promise<Category> {
     const targetCategory = await this.categoriesRepository.findOne({
       where: { id },
-      loadEagerRelations: false, // Do not need Tasks relation.
     });
 
     if (!targetCategory) {
@@ -122,8 +139,14 @@ export class CategoryService {
       newPosition
     );
 
-    await this.categoriesRepository.update({ id }, targetCategory);
-    return targetCategory;
+    // Save the Category.
+    const updatedCategory = await this.categoriesRepository.save(
+      targetCategory
+    );
+
+    // Sort Category's Tasks before returning.
+    sortTasksInCategory(updatedCategory, 'ASC');
+    return updatedCategory;
   }
 
   /**
@@ -134,36 +157,37 @@ export class CategoryService {
    * fitting lexical_order property to reflect its new position.
    * @param id
    * @param createTaskDto
-   * @returns
+   * @returns the Category with Tasks (the new one included) sorted by lexical_order
    */
   async addTask(id: number, createTaskDto: CreateTaskDto): Promise<Category> {
     // Here we grab the Category we're going to be inserting into.
-    const insertCategory = await this.categoriesRepository.findOne(id);
+    const targetCategory = await this.categoriesRepository.findOne(id);
 
-    if (!insertCategory) {
+    if (!targetCategory) {
       throw new EntityNotFoundException('Category', id);
     }
 
     // Get the Tasks that belong to the Category we're inserting into and sort them.
     const sortedSiblingTasks = lexicallySortEntities(
-      insertCategory.tasks,
+      targetCategory.tasks,
       'ASC'
     );
-
-    // Calculate the new order position.
-    const lexicalOrder =
-      sortedSiblingTasks.length > 0
-        ? insertLexicalSort(sortedSiblingTasks[0].lexical_order, '')
-        : insertLexicalSort('', '');
 
     // Build the new Task.
     const newTask = new Task();
     newTask.title = createTaskDto.title;
-    newTask.lexical_order = lexicalOrder;
+    newTask.lexical_order = positionEntity(sortedSiblingTasks, -1, -1);
 
-    insertCategory.tasks.push(newTask);
+    targetCategory.tasks.push(newTask);
 
-    return await this.categoriesRepository.save(insertCategory);
+    // Save the Category.
+    const updatedCategory = await this.categoriesRepository.save(
+      targetCategory
+    );
+
+    // Sort Category's Tasks before returning.
+    sortTasksInCategory(updatedCategory, 'ASC');
+    return updatedCategory;
   }
 
   /**
@@ -172,7 +196,7 @@ export class CategoryService {
    * Worth noting here that Task entities are configured in such a way as they
    * are deleted when their parent Category is deleted.
    * @param id
-   * @returns
+   * @returns DeleteResult
    */
   async delete(id: number): Promise<DeleteResult> {
     return await this.categoriesRepository.delete(id);

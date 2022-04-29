@@ -7,8 +7,7 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 import { CategoryService } from '../category/category.service';
 
 import { EntityNotFoundException } from '../exceptions/EntityNotFoundException';
-import { positionEntity } from '../utils/common.utils';
-import { lexicallySortEntities } from '../utils/common.utils';
+import { positionEntity, lexicallySortEntities } from '../utils/common.utils';
 
 @Injectable()
 export class TaskService {
@@ -19,11 +18,11 @@ export class TaskService {
   ) {}
 
   /**
-   * Updates a Task. Will not create a Task if the ID isn't found, it'll
-   * throw instead. (Use with PATCH, not PUT).
+   * Updates a Task.
+   * Will not create a Task if the ID isn't found, it'll throw instead.
    * @param id
    * @param updateTaskDto
-   * @returns
+   * @returns the updated Task
    */
   async update(id: number, updateTaskDto: UpdateTaskDto): Promise<Task> {
     const targetTask = await this.tasksRepository.findOne({
@@ -49,7 +48,7 @@ export class TaskService {
    * @param taskId
    * @param categoryId
    * @param position
-   * @returns
+   * @returns the Task that was moved with its new lexical_order property
    */
   async moveAndReposition(
     taskId: number,
@@ -101,7 +100,7 @@ export class TaskService {
    * Deletes a Task by its ID.
    * Will not throw an error if the ID doesn't exist.
    * @param id
-   * @returns
+   * @returns DeleteResult
    */
   async delete(id: number): Promise<DeleteResult> {
     return await this.tasksRepository.delete(id);

@@ -3,7 +3,7 @@ import { Task } from '../task/entities/task.entity';
 import { taskFactory } from '../testUtils/task.testUtils';
 import { categoryFactory } from '../testUtils/category.testUtils';
 import {
-  insertLexicalSort,
+  findLexicalPosition,
   lexicallySortEntities,
   positionEntity,
 } from './common.utils';
@@ -11,88 +11,88 @@ import {
 describe('insertLexicalSort()', () => {
   describe('unhappy path', () => {
     it('should throw on malformed input', () => {
-      expect(() => insertLexicalSort('!', '@')).toThrow();
+      expect(() => findLexicalPosition('!', '@')).toThrow();
     });
 
     it('should throw with "" and "a"', () => {
-      expect(() => insertLexicalSort('', 'a')).toThrow();
+      expect(() => findLexicalPosition('', 'a')).toThrow();
     });
 
     it('should throw with "" and "aaa"', () => {
-      expect(() => insertLexicalSort('', 'aaa')).toThrow();
+      expect(() => findLexicalPosition('', 'aaa')).toThrow();
     });
   });
 
   describe('happy path', () => {
     it('"" and "aaab" should work correctly', () => {
-      expect(insertLexicalSort('', 'aaab')).toBe('aaaan');
+      expect(findLexicalPosition('', 'aaab')).toBe('aaaan');
     });
     it('"" and "" should work correctly', () => {
-      expect(insertLexicalSort('', '')).toBe('n');
+      expect(findLexicalPosition('', '')).toBe('n');
     });
 
     it('"n" and "" should work correctly', () => {
-      expect(insertLexicalSort('n', '')).toBe('u');
+      expect(findLexicalPosition('n', '')).toBe('u');
     });
 
     it('"zy" and "zz" should correctly handle', () => {
-      expect(insertLexicalSort('zy', 'zz')).toBe('zyn');
+      expect(findLexicalPosition('zy', 'zz')).toBe('zyn');
     });
 
     it('"a" and "c" should work correctly', () => {
-      expect(insertLexicalSort('a', 'c')).toBe('b');
+      expect(findLexicalPosition('a', 'c')).toBe('b');
     });
 
     it('"a" and "b" should work correctly', () => {
-      expect(insertLexicalSort('a', 'b')).toBe('an');
+      expect(findLexicalPosition('a', 'b')).toBe('an');
     });
 
     it('"a" and "an" should work correctly', () => {
-      expect(insertLexicalSort('a', 'an')).toBe('ag');
+      expect(findLexicalPosition('a', 'an')).toBe('ag');
     });
 
     it('"z" and "" should work correctly', () => {
-      expect(insertLexicalSort('z', '')).toBe('zn');
+      expect(findLexicalPosition('z', '')).toBe('zn');
     });
 
     it('"zz" and "" should work correctly', () => {
-      expect(insertLexicalSort('zz', '')).toBe('zzn');
+      expect(findLexicalPosition('zz', '')).toBe('zzn');
     });
 
     it('handles a typical insert series correctly', () => {
-      expect(insertLexicalSort('', '')).toBe('n');
-      expect(insertLexicalSort('n', '')).toBe('u');
-      expect(insertLexicalSort('n', 'u')).toBe('r');
-      expect(insertLexicalSort('n', 'r')).toBe('p');
-      expect(insertLexicalSort('n', 'p')).toBe('o');
-      expect(insertLexicalSort('n', 'o')).toBe('nn');
-      expect(insertLexicalSort('n', 'nn')).toBe('ng');
-      expect(insertLexicalSort('n', 'ng')).toBe('nd');
-      expect(insertLexicalSort('n', 'nd')).toBe('nb');
+      expect(findLexicalPosition('', '')).toBe('n');
+      expect(findLexicalPosition('n', '')).toBe('u');
+      expect(findLexicalPosition('n', 'u')).toBe('r');
+      expect(findLexicalPosition('n', 'r')).toBe('p');
+      expect(findLexicalPosition('n', 'p')).toBe('o');
+      expect(findLexicalPosition('n', 'o')).toBe('nn');
+      expect(findLexicalPosition('n', 'nn')).toBe('ng');
+      expect(findLexicalPosition('n', 'ng')).toBe('nd');
+      expect(findLexicalPosition('n', 'nd')).toBe('nb');
 
       // This is a limitation of the algorithm. It should be "na" but rounding prevents it.
-      expect(insertLexicalSort('n', 'nb')).toBe('nan');
+      expect(findLexicalPosition('n', 'nb')).toBe('nan');
     });
 
     it('avoids the dead end of a series of "a"s', () => {
-      expect(insertLexicalSort('', 'b')).toBe('an');
-      expect(insertLexicalSort('', 'an')).toBe('ag');
-      expect(insertLexicalSort('', 'ag')).toBe('ad');
-      expect(insertLexicalSort('', 'ad')).toBe('ab');
-      expect(insertLexicalSort('', 'ab')).toBe('aan');
-      expect(insertLexicalSort('', 'aan')).toBe('aag');
-      expect(insertLexicalSort('', 'aag')).toBe('aad');
-      expect(insertLexicalSort('', 'aad')).toBe('aab');
-      expect(insertLexicalSort('', 'aab')).toBe('aaan');
+      expect(findLexicalPosition('', 'b')).toBe('an');
+      expect(findLexicalPosition('', 'an')).toBe('ag');
+      expect(findLexicalPosition('', 'ag')).toBe('ad');
+      expect(findLexicalPosition('', 'ad')).toBe('ab');
+      expect(findLexicalPosition('', 'ab')).toBe('aan');
+      expect(findLexicalPosition('', 'aan')).toBe('aag');
+      expect(findLexicalPosition('', 'aag')).toBe('aad');
+      expect(findLexicalPosition('', 'aad')).toBe('aab');
+      expect(findLexicalPosition('', 'aab')).toBe('aaan');
     });
 
     it('handles "z" edge case correctly', () => {
-      expect(insertLexicalSort('y', '')).toBe('z');
-      expect(insertLexicalSort('z', '')).toBe('zn');
-      expect(insertLexicalSort('zn', '')).toBe('zu');
-      expect(insertLexicalSort('zu', '')).toBe('zx');
-      expect(insertLexicalSort('zx', '')).toBe('zz');
-      expect(insertLexicalSort('zz', '')).toBe('zzn');
+      expect(findLexicalPosition('y', '')).toBe('z');
+      expect(findLexicalPosition('z', '')).toBe('zn');
+      expect(findLexicalPosition('zn', '')).toBe('zu');
+      expect(findLexicalPosition('zu', '')).toBe('zx');
+      expect(findLexicalPosition('zx', '')).toBe('zz');
+      expect(findLexicalPosition('zz', '')).toBe('zzn');
     });
   });
 });
