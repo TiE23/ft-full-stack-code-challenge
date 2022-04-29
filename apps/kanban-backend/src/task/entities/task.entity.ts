@@ -24,6 +24,9 @@ export class Task {
   })
   category: Category;
 
+  @Column({ nullable: false })
+  lexical_order: string;
+
   @CreateDateColumn({ nullable: false })
   created_at: Date;
 

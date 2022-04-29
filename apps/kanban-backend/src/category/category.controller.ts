@@ -39,6 +39,14 @@ export class CategoryController {
     return this.categoryService.update(id, updateCategoryDto);
   }
 
+  @Patch(':id/repositionto/:newPosition')
+  reposition(
+    @Param('id') id: number,
+    @Param('newPosition') newPosition: number
+  ) {
+    return this.categoryService.reposition(id, newPosition);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: number) {
     return this.categoryService.remove(id);

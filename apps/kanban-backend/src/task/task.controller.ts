@@ -44,6 +44,14 @@ export class TaskController {
     return this.taskService.move(taskId, categoryId);
   }
 
+  @Patch(':id/repositionto/:newPosition')
+  reposition(
+    @Param('id') id: number,
+    @Param('newPosition') newPosition: number
+  ) {
+    return this.taskService.reposition(id, newPosition);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: number) {
     return this.taskService.remove(id);
