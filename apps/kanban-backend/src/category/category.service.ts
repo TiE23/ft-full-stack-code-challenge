@@ -20,7 +20,7 @@ import { sortTasksInCategory } from '../utils/category.utils';
 export class CategoryService {
   constructor(
     @InjectRepository(CategoryEntity)
-    private categoriesRepository: Repository<CategoryEntity>
+    private readonly categoriesRepository: Repository<CategoryEntity>
   ) {}
 
   /**

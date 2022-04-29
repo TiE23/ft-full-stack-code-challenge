@@ -7,8 +7,9 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { CreateTaskDto } from '../task/dto/create-task.dto';
+import { DeleteResult } from 'typeorm';
 
+import { CreateTaskDto } from '../task/dto/create-task.dto';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -60,7 +61,7 @@ export class CategoryController {
   }
 
   @Delete(':id')
-  delete(@Param('id') id: number) {
+  delete(@Param('id') id: number): Promise<DeleteResult> {
     return this.categoryService.delete(id);
   }
 }

@@ -13,8 +13,8 @@ import { positionEntity, lexicallySortEntities } from '../utils/common.utils';
 export class TaskService {
   constructor(
     @InjectRepository(TaskEntity)
-    private tasksRepository: Repository<TaskEntity>,
-    private categoriesService: CategoryService
+    private readonly tasksRepository: Repository<TaskEntity>,
+    private readonly categoriesService: CategoryService
   ) {}
 
   /**
