@@ -7,8 +7,8 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 import { CategoryService } from '../category/category.service';
 
 import { EntityNotFoundException } from '../exceptions/EntityNotFoundException';
-import { insertLexicalSort } from '../utils/common.utils';
-import { lexicalSortTasks } from '../utils/task.utils';
+import { repositionEntity } from '../utils/common.utils';
+import { lexicallySortEntities } from '../utils/common.utils';
 
 @Injectable()
 export class TaskService {
@@ -18,19 +18,13 @@ export class TaskService {
     private categoriesService: CategoryService
   ) {}
 
-  async findAll(): Promise<Task[]> {
-    return await this.tasksRepository.find({
-      relations: ['category'],
-    });
-  }
-
-  async findOne(id: number): Promise<Task> {
-    return await this.tasksRepository.findOne({
-      where: { id },
-      relations: ['category'],
-    });
-  }
-
+  /**
+   * Updates a Task. Will not create a Task if the ID isn't found, it'll
+   * throw instead. (Use with PATCH, not PUT).
+   * @param id
+   * @param updateTaskDto
+   * @returns
+   */
   async update(id: number, updateTaskDto: UpdateTaskDto): Promise<Task> {
     const targetTask = await this.tasksRepository.findOne({
       where: { id },
@@ -47,7 +41,21 @@ export class TaskService {
     });
   }
 
-  async move(taskId: number, categoryId: number): Promise<Task> {
+  /**
+   * Moves a Task to a different Category based on ID values. If an ID doesn't
+   * exist for either Task or Category it'll throw.
+   * It also takes new position argument to allow both changing Categories and
+   * inserting the Task between its new siblings.
+   * @param taskId
+   * @param categoryId
+   * @param position
+   * @returns
+   */
+  async changeCategory(
+    taskId: number,
+    categoryId: number,
+    position: number
+  ): Promise<Task> {
     // Get the Task by its ID. Also retrieve its relation to Category, we'll need it.
     const targetTask = await this.tasksRepository.findOne({
       where: { id: taskId },
@@ -77,6 +85,9 @@ export class TaskService {
     // Update the Task. The Cascade option for the Relation will handle the rest.
     await this.tasksRepository.update({ id: taskId }, targetTask);
 
+    // Simple solution to order the Task into the desired position.
+    await this.reposition(taskId, position);
+
     // Return the newly updated Task so that we can get updated Category relation.
     return await this.tasksRepository.findOne(targetTask.id, {
       relations: ['category'],
@@ -94,7 +105,7 @@ export class TaskService {
     }
 
     // Get the Tasks that belong to the Category we're inserting into and sort them.
-    const sortedSiblingTasks = lexicalSortTasks(
+    const sortedSiblingTasks = lexicallySortEntities(
       targetTask.category.tasks,
       'ASC'
     );
@@ -118,9 +129,11 @@ export class TaskService {
     }
 
     // Generate the lexical order string that will sort it between these Tasks.
-    targetTask.lexical_order = insertLexicalSort(prevLex, nextLex);
-    console.table(sortedSiblingTasks);
-    console.log('new lex', targetTask.lexical_order);
+    targetTask.lexical_order = repositionEntity<Task>(
+      sortedSiblingTasks,
+      id,
+      newPosition
+    );
 
     await this.tasksRepository.update(
       { id },
@@ -133,7 +146,7 @@ export class TaskService {
     return this.tasksRepository.findOne(id, { relations: ['category'] });
   }
 
-  async remove(id: number): Promise<DeleteResult> {
+  async delete(id: number): Promise<DeleteResult> {
     return await this.tasksRepository.delete(id);
   }
 }

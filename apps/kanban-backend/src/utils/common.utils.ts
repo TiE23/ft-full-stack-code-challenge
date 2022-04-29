@@ -31,8 +31,12 @@
  * This keeps happening.
  * "n" and "p" returns "o"
  * "n" and "o" returns "nn" (!)
- * Woah, that's different! Well, that;s because "n" and "o" are consecutive, and
+ * Woah, that's different! Well, that's because "n" and "o" are consecutive, and
  * "nn" comes after "n" and before "o" in a alphabetic sort.
+ *
+ * Note that whenever the algorithm needs to use a new character it uses "n"
+ * because it is in the middle of the alphabet as the 14th letter in a basic
+ * attempt to keep strings short.
  *
  * I want to say that, yes, I did borrow this implementation from StackOverflow
  * to save me time, but this wasn't difficult to imagine as a fun solution.
@@ -108,4 +112,56 @@ export function insertLexicalSort(prev: string, next: string): string {
 
   // Append the middle character at the end.
   return str + String.fromCharCode(Math.ceil((p + n) / 2));
+}
+
+interface Sortable {
+  id: number;
+  lexical_order: string;
+}
+
+/**
+ * Takes a list of Tasks or Categories, copies it, and then sorts them by their
+ * lexical_order properties.
+ * @param entities
+ * @param order
+ * @returns
+ */
+export function lexicallySortEntities<T extends Sortable>(
+  entities: T[],
+  order: 'ASC' | 'DESC'
+): T[] {
+  const flip = order === 'ASC' ? 1 : -1; // Flipping the order.
+  return Array.from(entities).sort(
+    ({ lexical_order: a }: T, { lexical_order: b }: T) =>
+      (a > b ? 1 : a < b ? -1 : 0) * flip
+  );
+}
+
+/**
+ *
+ * @param sortedEntities the SORTED array of sibling entities
+ * @param id the id of the entity you're trying to position
+ * @param position
+ * @returns the new lexical_order the entity should use.
+ */
+export function repositionEntity<T extends Sortable>(
+  sortedEntities: T[],
+  id: number,
+  position: number
+): string {
+  let prevLex = '';
+  let nextLex = '';
+
+  if (position >= sortedEntities.length) {
+    prevLex = sortedEntities[sortedEntities.length - 1].lexical_order;
+  } else if (sortedEntities[position].id === id) {
+    return sortedEntities[position].lexical_order;
+  } else if (position === 0) {
+    nextLex = sortedEntities[0].lexical_order;
+  } else {
+    prevLex = sortedEntities[position - 1].lexical_order;
+    nextLex = sortedEntities[position].lexical_order;
+  }
+
+  return insertLexicalSort(prevLex, nextLex);
 }

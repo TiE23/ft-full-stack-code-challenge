@@ -49,16 +49,16 @@ export class CategoryController {
     return this.categoryService.reposition(id, newPosition);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.categoryService.remove(id);
-  }
-
   @Post(':id/addtask')
   addTask(
     @Param('id') id: number,
     @Body() createTaskDto: CreateTaskDto
   ): Promise<Category> {
     return this.categoryService.addTask(id, createTaskDto);
+  }
+
+  @Delete(':id')
+  delete(@Param('id') id: number) {
+    return this.categoryService.delete(id);
   }
 }

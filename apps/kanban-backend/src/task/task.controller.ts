@@ -7,26 +7,15 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
+import { DeleteResult } from 'typeorm';
 
 import { TaskService } from './task.service';
-import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { DeleteResult } from 'typeorm';
 import { Task } from './entities/task.entity';
 
 @Controller('task')
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
-
-  @Get()
-  findAll(): Promise<Task[]> {
-    return this.taskService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: number): Promise<Task> {
-    return this.taskService.findOne(id);
-  }
 
   @Patch(':id')
   update(
@@ -36,12 +25,13 @@ export class TaskController {
     return this.taskService.update(id, updateTaskDto);
   }
 
-  @Patch(':taskId/moveto/:categoryId')
-  move(
+  @Patch(':taskId/moveto/:categoryId/:position')
+  changeCategory(
     @Param('taskId') taskId: number,
-    @Param('categoryId') categoryId: number
+    @Param('categoryId') categoryId: number,
+    @Param('position') position: number
   ): Promise<Task> {
-    return this.taskService.move(taskId, categoryId);
+    return this.taskService.changeCategory(taskId, categoryId, position);
   }
 
   @Patch(':id/repositionto/:newPosition')
@@ -53,7 +43,7 @@ export class TaskController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number): Promise<DeleteResult> {
-    return this.taskService.remove(id);
+  delete(@Param('id') id: number): Promise<DeleteResult> {
+    return this.taskService.delete(id);
   }
 }
