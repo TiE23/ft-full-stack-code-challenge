@@ -41,7 +41,7 @@
  * @param prev
  * @param next
  */
-export function insertLexiSort(prev: string, next: string): string {
+export function insertLexicalSort(prev: string, next: string): string {
   let pos = 0;
   let p = 0;
   let n = 0;

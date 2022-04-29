@@ -7,27 +7,29 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
+import { CreateTaskDto } from '../task/dto/create-task.dto';
 
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { Category } from './entities/category.entity';
 
 @Controller('category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Post()
-  create(@Body() createCategoryDto: CreateCategoryDto) {
+  create(@Body() createCategoryDto: CreateCategoryDto): Promise<Category> {
     return this.categoryService.create(createCategoryDto);
   }
 
   @Get()
-  findAll() {
+  findAll(): Promise<Category[]> {
     return this.categoryService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
+  findOne(@Param('id') id: number): Promise<Category> {
     return this.categoryService.findOne(id);
   }
 
@@ -35,7 +37,7 @@ export class CategoryController {
   update(
     @Param('id') id: number,
     @Body() updateCategoryDto: UpdateCategoryDto
-  ) {
+  ): Promise<Category> {
     return this.categoryService.update(id, updateCategoryDto);
   }
 
@@ -43,12 +45,20 @@ export class CategoryController {
   reposition(
     @Param('id') id: number,
     @Param('newPosition') newPosition: number
-  ) {
+  ): Promise<Category> {
     return this.categoryService.reposition(id, newPosition);
   }
 
   @Delete(':id')
   remove(@Param('id') id: number) {
     return this.categoryService.remove(id);
+  }
+
+  @Post(':id/addtask')
+  addTask(
+    @Param('id') id: number,
+    @Body() createTaskDto: CreateTaskDto
+  ): Promise<Category> {
+    return this.categoryService.addTask(id, createTaskDto);
   }
 }

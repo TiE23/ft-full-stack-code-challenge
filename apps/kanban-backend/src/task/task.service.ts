@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 
-import { CreateTaskDto } from './dto/create-task.dto';
-import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './entities/task.entity';
+import { UpdateTaskDto } from './dto/update-task.dto';
 import { CategoryService } from '../category/category.service';
 
-import { insertLexiSort } from '../utils/lexigraphicalSorting';
 import { EntityNotFoundException } from '../exceptions/EntityNotFoundException';
+import { insertLexicalSort } from '../utils/common.utils';
+import { lexicalSortTasks } from '../utils/task.utils';
 
 @Injectable()
 export class TaskService {
@@ -18,58 +18,20 @@ export class TaskService {
     private categoriesService: CategoryService
   ) {}
 
-  async create(createTaskDto: CreateTaskDto) {
-    // Here we grab the Category we're going to be inserting into.
-    const insertCategory = await this.categoriesService.findOne(
-      createTaskDto.categoryId
-    );
-
-    if (!insertCategory) {
-      throw new EntityNotFoundException('Category', createTaskDto.categoryId);
-    }
-
-    // Get the Tasks that belong to the Category we're inserting into and sort them.
-    // Use Array.from() as to not to mutate the array as a precaution.
-    const sortedSiblingTasks = Array.from(insertCategory.tasks).sort(
-      ({ lexical_order: a }: Task, { lexical_order: b }: Task) =>
-        a < b ? -1 : a > b ? 1 : 0 // DESC (z, y, x, ... a) order.
-    );
-
-    // Calculate the new order position.
-    const lexicalOrder =
-      sortedSiblingTasks.length > 0
-        ? insertLexiSort(sortedSiblingTasks[0].lexical_order, '')
-        : insertLexiSort('', '');
-
-    // Build the new Task, providing the Category we found.
-    const newTask = new Task();
-    newTask.title = createTaskDto.title;
-    newTask.category = insertCategory;
-    newTask.lexical_order = lexicalOrder;
-
-    // Cascade rule will take care of the update to Category for us.
-    const savedTask = await this.tasksRepository.save(newTask);
-
-    // Return the newly saved Task so that we can get updated Category relation.
-    return await this.tasksRepository.findOne(savedTask.id, {
-      relations: ['category'],
-    });
-  }
-
-  async findAll() {
+  async findAll(): Promise<Task[]> {
     return await this.tasksRepository.find({
       relations: ['category'],
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<Task> {
     return await this.tasksRepository.findOne({
       where: { id },
       relations: ['category'],
     });
   }
 
-  async update(id: number, updateTaskDto: UpdateTaskDto) {
+  async update(id: number, updateTaskDto: UpdateTaskDto): Promise<Task> {
     const targetTask = await this.tasksRepository.findOne({
       where: { id },
     });
@@ -85,7 +47,7 @@ export class TaskService {
     });
   }
 
-  async move(taskId: number, categoryId: number) {
+  async move(taskId: number, categoryId: number): Promise<Task> {
     // Get the Task by its ID. Also retrieve its relation to Category, we'll need it.
     const targetTask = await this.tasksRepository.findOne({
       where: { id: taskId },
@@ -121,7 +83,7 @@ export class TaskService {
     });
   }
 
-  async reposition(id: number, newPosition: number) {
+  async reposition(id: number, newPosition: number): Promise<Task> {
     const targetTask = await this.tasksRepository.findOne({
       where: { id },
       relations: ['category'],
@@ -132,17 +94,10 @@ export class TaskService {
     }
 
     // Get the Tasks that belong to the Category we're inserting into and sort them.
-    // Use Array.from() as to not to mutate the array as a precaution.
-    const sortedSiblingTasks = Array.from(targetTask.category.tasks).sort(
-      ({ lexical_order: a }: Task, { lexical_order: b }: Task) =>
-        a < b ? 1 : a > b ? -1 : 0 // ASC (a, b, c, ... z) order.
+    const sortedSiblingTasks = lexicalSortTasks(
+      targetTask.category.tasks,
+      'ASC'
     );
-
-    // // Calculate the new order position.
-    // const lexicalOrder =
-    //   sortedSiblingTasks.length > 0
-    //     ? insertLexiSort(sortedSiblingTasks[0].lexical_order, '')
-    //     : insertLexiSort('', '');
 
     let prevLex = '';
     let nextLex = '';
@@ -150,12 +105,12 @@ export class TaskService {
     if (newPosition >= sortedSiblingTasks.length) {
       // After the end.
       prevLex = sortedSiblingTasks[sortedSiblingTasks.length - 1].lexical_order;
+    } else if (sortedSiblingTasks[newPosition].id === id) {
+      // There is no change in position.
+      return targetTask;
     } else if (newPosition === 0) {
       // Before the start.
       nextLex = sortedSiblingTasks[0].lexical_order;
-    } else if (id === sortedSiblingTasks[newPosition].id) {
-      // No change in position.
-      return targetTask;
     } else {
       // Set the prev and next lex strings to be between where we want to insert.
       prevLex = sortedSiblingTasks[newPosition - 1].lexical_order;
@@ -163,7 +118,9 @@ export class TaskService {
     }
 
     // Generate the lexical order string that will sort it between these Tasks.
-    targetTask.lexical_order = insertLexiSort(prevLex, nextLex);
+    targetTask.lexical_order = insertLexicalSort(prevLex, nextLex);
+    console.table(sortedSiblingTasks);
+    console.log('new lex', targetTask.lexical_order);
 
     await this.tasksRepository.update(
       { id },
@@ -173,10 +130,10 @@ export class TaskService {
       }
     );
 
-    return this.tasksRepository.findOne(id);
+    return this.tasksRepository.findOne(id, { relations: ['category'] });
   }
 
-  async remove(id: number) {
+  async remove(id: number): Promise<DeleteResult> {
     return await this.tasksRepository.delete(id);
   }
 }
