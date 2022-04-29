@@ -26,7 +26,7 @@ export class TaskController {
   }
 
   @Patch(':taskId/moveto/:categoryId/:position')
-  changeCategory(
+  moveAndReposition(
     @Param('taskId') taskId: number,
     @Param('categoryId') categoryId: number,
     @Param('position') position: number
