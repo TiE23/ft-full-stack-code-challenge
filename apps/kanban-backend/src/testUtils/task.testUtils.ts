@@ -1,13 +1,13 @@
 import { DeepPartial } from 'typeorm';
-import { Task } from '../task/entities/task.entity';
+import { TaskEntity } from '../task/entities/task.entity';
 
 /**
  * Easily generate new Task entities with partial data for testing purposes.
  * @param taskData
  * @returns
  */
-export function taskFactory(taskData: DeepPartial<Task>): Task {
-  const newTask = new Task();
+export function taskFactory(taskData: DeepPartial<TaskEntity>): TaskEntity {
+  const newTask = new TaskEntity();
   Object.assign(newTask, taskData);
   return newTask;
 }

@@ -1,5 +1,5 @@
-import { Category } from '../category/entities/category.entity';
-import { Task } from '../task/entities/task.entity';
+import { CategoryEntity } from '../category/entities/category.entity';
+import { TaskEntity } from '../task/entities/task.entity';
 import { taskFactory } from '../testUtils/task.testUtils';
 import { categoryFactory } from '../testUtils/category.testUtils';
 import {
@@ -99,7 +99,7 @@ describe('insertLexicalSort()', () => {
 
 describe('lexicallySortEntities()', () => {
   describe('sort Tasks', () => {
-    let testTasks: Task[] = [];
+    let testTasks: TaskEntity[] = [];
     beforeEach(() => {
       testTasks = [];
       testTasks.push(taskFactory({ id: 0, lexical_order: 'f' }));
@@ -110,14 +110,18 @@ describe('lexicallySortEntities()', () => {
 
     it('should sort ascending', () => {
       expect(
-        lexicallySortEntities<Task>(testTasks, 'ASC').map((task) => task.id)
+        lexicallySortEntities<TaskEntity>(testTasks, 'ASC').map(
+          (task) => task.id
+        )
       ).toEqual([1, 0, 3, 2]);
       // Should not modify the order of the original array.
       expect(testTasks.map((task) => task.id)).toEqual([0, 1, 2, 3]);
     });
     it('should sort descending', () => {
       expect(
-        lexicallySortEntities<Task>(testTasks, 'DESC').map((task) => task.id)
+        lexicallySortEntities<TaskEntity>(testTasks, 'DESC').map(
+          (task) => task.id
+        )
       ).toEqual([2, 3, 0, 1]);
       // Should not modify the order of the original array.
       expect(testTasks.map((task) => task.id)).toEqual([0, 1, 2, 3]);
@@ -127,7 +131,7 @@ describe('lexicallySortEntities()', () => {
 
 describe('positionEntity()', () => {
   describe('inserting Tasks', () => {
-    let testTasks: Task[] = [];
+    let testTasks: TaskEntity[] = [];
     beforeEach(() => {
       testTasks = [];
       testTasks.push(taskFactory({ id: 0, lexical_order: 'c' }));
@@ -162,7 +166,7 @@ describe('positionEntity()', () => {
   });
 
   describe('repositioning Tasks', () => {
-    let testTasks: Task[] = [];
+    let testTasks: TaskEntity[] = [];
     beforeEach(() => {
       testTasks = [];
       testTasks.push(taskFactory({ id: 0, lexical_order: 'c' }));
@@ -204,7 +208,7 @@ describe('positionEntity()', () => {
     });
   });
   describe('inserting Categories', () => {
-    let testCategories: Category[] = [];
+    let testCategories: CategoryEntity[] = [];
     beforeEach(() => {
       testCategories = [];
       testCategories.push(categoryFactory({ id: 0, lexical_order: 'c' }));
@@ -239,7 +243,7 @@ describe('positionEntity()', () => {
   });
 
   describe('repositioning Categories', () => {
-    let testCategories: Category[] = [];
+    let testCategories: CategoryEntity[] = [];
     beforeEach(() => {
       testCategories = [];
       testCategories.push(categoryFactory({ id: 0, lexical_order: 'c' }));

@@ -11,7 +11,7 @@ import { DeleteResult } from 'typeorm';
 
 import { TaskService } from './task.service';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { Task } from './entities/task.entity';
+import { TaskEntity } from './entities/task.entity';
 
 @Controller('task')
 export class TaskController {
@@ -21,7 +21,7 @@ export class TaskController {
   update(
     @Param('id') id: number,
     @Body() updateTaskDto: UpdateTaskDto
-  ): Promise<Task> {
+  ): Promise<TaskEntity> {
     return this.taskService.update(id, updateTaskDto);
   }
 
@@ -30,7 +30,7 @@ export class TaskController {
     @Param('taskId') taskId: number,
     @Param('categoryId') categoryId: number,
     @Param('position') position: number
-  ): Promise<Task> {
+  ): Promise<TaskEntity> {
     return this.taskService.moveAndReposition(taskId, categoryId, position);
   }
 

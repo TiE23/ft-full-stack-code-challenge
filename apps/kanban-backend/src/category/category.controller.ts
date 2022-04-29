@@ -12,24 +12,26 @@ import { CreateTaskDto } from '../task/dto/create-task.dto';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { Category } from './entities/category.entity';
+import { CategoryEntity } from './entities/category.entity';
 
 @Controller('category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Post()
-  create(@Body() createCategoryDto: CreateCategoryDto): Promise<Category> {
+  create(
+    @Body() createCategoryDto: CreateCategoryDto
+  ): Promise<CategoryEntity> {
     return this.categoryService.create(createCategoryDto);
   }
 
   @Get()
-  findAll(): Promise<Category[]> {
+  findAll(): Promise<CategoryEntity[]> {
     return this.categoryService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number): Promise<Category> {
+  findOne(@Param('id') id: number): Promise<CategoryEntity> {
     return this.categoryService.findOne(id);
   }
 
@@ -37,7 +39,7 @@ export class CategoryController {
   update(
     @Param('id') id: number,
     @Body() updateCategoryDto: UpdateCategoryDto
-  ): Promise<Category> {
+  ): Promise<CategoryEntity> {
     return this.categoryService.update(id, updateCategoryDto);
   }
 
@@ -45,7 +47,7 @@ export class CategoryController {
   reposition(
     @Param('id') id: number,
     @Param('newPosition') newPosition: number
-  ): Promise<Category> {
+  ): Promise<CategoryEntity> {
     return this.categoryService.reposition(id, newPosition);
   }
 
@@ -53,7 +55,7 @@ export class CategoryController {
   addTask(
     @Param('id') id: number,
     @Body() createTaskDto: CreateTaskDto
-  ): Promise<Category> {
+  ): Promise<CategoryEntity> {
     return this.categoryService.addTask(id, createTaskDto);
   }
 

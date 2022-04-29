@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
 
-import { Category } from './entities/category.entity';
+import { CategoryEntity } from './entities/category.entity';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { Task } from '../task/entities/task.entity';
+import { TaskEntity } from '../task/entities/task.entity';
 import { CreateTaskDto } from '../task/dto/create-task.dto';
 
 import { EntityNotFoundException } from '../exceptions/EntityNotFoundException';
@@ -19,8 +19,8 @@ import { sortTasksInCategory } from '../utils/category.utils';
 @Injectable()
 export class CategoryService {
   constructor(
-    @InjectRepository(Category)
-    private categoriesRepository: Repository<Category>
+    @InjectRepository(CategoryEntity)
+    private categoriesRepository: Repository<CategoryEntity>
   ) {}
 
   /**
@@ -29,7 +29,7 @@ export class CategoryService {
    * @param createCategoryDto
    * @returns
    */
-  async create(createCategoryDto: CreateCategoryDto) {
+  async create(createCategoryDto: CreateCategoryDto): Promise<CategoryEntity> {
     // Creating a new Category always defaults to the end. So, grab the last Category.
     const categories = await this.categoriesRepository.find({
       order: { lexical_order: 'DESC' }, // DESC (z, y, x, ... a) order.
@@ -50,7 +50,7 @@ export class CategoryService {
    * Finds all Categories.
    * @returnsall the Categories and their Tasks all sorted by lexical_order
    */
-  async findAll() {
+  async findAll(): Promise<CategoryEntity[]> {
     const categories = await this.categoriesRepository.find({
       relations: ['tasks'],
       order: { lexical_order: 'ASC' },
@@ -67,7 +67,7 @@ export class CategoryService {
    * @param id
    * @returns the Category and its Tasks all sorted by lexical_order
    */
-  async findOne(id: number): Promise<Category> {
+  async findOne(id: number): Promise<CategoryEntity> {
     const category = await this.categoriesRepository.findOne({
       where: { id },
       relations: ['tasks'],
@@ -92,7 +92,7 @@ export class CategoryService {
   async update(
     id: number,
     updateCategoryDto: UpdateCategoryDto
-  ): Promise<Category> {
+  ): Promise<CategoryEntity> {
     const targetCategory = await this.categoriesRepository.findOne({
       where: { id },
     });
@@ -119,7 +119,7 @@ export class CategoryService {
    * @param newPosition
    * @returns the Category with Tasks sorted by lexical_order
    */
-  async reposition(id: number, newPosition: number): Promise<Category> {
+  async reposition(id: number, newPosition: number): Promise<CategoryEntity> {
     const targetCategory = await this.categoriesRepository.findOne({
       where: { id },
     });
@@ -133,7 +133,7 @@ export class CategoryService {
     });
 
     // Generate the lexical order string that will sort it between these Categories.
-    targetCategory.lexical_order = positionEntity<Category>(
+    targetCategory.lexical_order = positionEntity<CategoryEntity>(
       categories,
       id,
       newPosition
@@ -159,7 +159,10 @@ export class CategoryService {
    * @param createTaskDto
    * @returns the Category with Tasks (the new one included) sorted by lexical_order
    */
-  async addTask(id: number, createTaskDto: CreateTaskDto): Promise<Category> {
+  async addTask(
+    id: number,
+    createTaskDto: CreateTaskDto
+  ): Promise<CategoryEntity> {
     // Here we grab the Category we're going to be inserting into.
     const targetCategory = await this.categoriesRepository.findOne(id);
 
@@ -174,7 +177,7 @@ export class CategoryService {
     );
 
     // Build the new Task.
-    const newTask = new Task();
+    const newTask = new TaskEntity();
     newTask.title = createTaskDto.title;
     newTask.lexical_order = positionEntity(sortedSiblingTasks, -1, -1);
 

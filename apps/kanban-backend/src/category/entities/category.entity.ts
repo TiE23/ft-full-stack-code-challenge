@@ -7,7 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 
-import { Task } from '../../task/entities/task.entity';
+import { TaskEntity } from '../../task/entities/task.entity';
 import { LexicalOrder } from '../../types/entity.types';
 
 /**
@@ -15,19 +15,19 @@ import { LexicalOrder } from '../../types/entity.types';
  * https://typeorm.io/active-record-data-mapper
  */
 @Entity()
-export class Category {
+export class CategoryEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ nullable: false, unique: true })
   title: string;
 
-  @OneToMany(() => Task, (task) => task.category, {
+  @OneToMany(() => TaskEntity, (task) => task.category, {
     nullable: false,
     cascade: ['insert'],
     eager: true, // Want to always return tasks when loading Category entities.
   })
-  tasks: Task[];
+  tasks: TaskEntity[];
 
   @Column({ nullable: false, type: 'varchar' })
   lexical_order: LexicalOrder;

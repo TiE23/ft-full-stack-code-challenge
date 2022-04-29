@@ -1,4 +1,4 @@
-import { Category } from '../category/entities/category.entity';
+import { CategoryEntity } from '../category/entities/category.entity';
 import { SortDirection } from '../types/utils.types';
 import { lexicallySortEntities } from './common.utils';
 
@@ -9,7 +9,7 @@ import { lexicallySortEntities } from './common.utils';
  * @param sortDirection
  */
 export function sortTasksInCategory(
-  category: Category,
+  category: CategoryEntity,
   sortDirection: SortDirection
 ): void {
   if (!category.tasks) {

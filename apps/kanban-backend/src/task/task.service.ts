@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
 
-import { Task } from './entities/task.entity';
+import { TaskEntity } from './entities/task.entity';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { CategoryService } from '../category/category.service';
 
@@ -12,8 +12,8 @@ import { positionEntity, lexicallySortEntities } from '../utils/common.utils';
 @Injectable()
 export class TaskService {
   constructor(
-    @InjectRepository(Task)
-    private tasksRepository: Repository<Task>,
+    @InjectRepository(TaskEntity)
+    private tasksRepository: Repository<TaskEntity>,
     private categoriesService: CategoryService
   ) {}
 
@@ -24,7 +24,7 @@ export class TaskService {
    * @param updateTaskDto
    * @returns the updated Task
    */
-  async update(id: number, updateTaskDto: UpdateTaskDto): Promise<Task> {
+  async update(id: number, updateTaskDto: UpdateTaskDto): Promise<TaskEntity> {
     const targetTask = await this.tasksRepository.findOne({
       where: { id },
     });
@@ -54,7 +54,7 @@ export class TaskService {
     taskId: number,
     categoryId: number,
     position: number
-  ): Promise<Task> {
+  ): Promise<TaskEntity> {
     // Get the Task by its ID. Also retrieve its relation to Category, we'll need it.
     const targetTask = await this.tasksRepository.findOne({
       where: { id: taskId },
@@ -81,7 +81,7 @@ export class TaskService {
     );
 
     // Generate the lexical order string that will sort it between these Tasks.
-    targetTask.lexical_order = positionEntity<Task>(
+    targetTask.lexical_order = positionEntity<TaskEntity>(
       sortedSiblingTasks,
       taskId,
       position
