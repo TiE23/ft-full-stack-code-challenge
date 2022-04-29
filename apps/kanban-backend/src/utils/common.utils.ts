@@ -1,3 +1,5 @@
+import { LexicalOrder } from '../types/entity.types';
+
 /**
  * This is adapted from a solution shared on StackOverflow.
  * https://stackoverflow.com/a/38927158/3120546
@@ -114,9 +116,9 @@ export function insertLexicalSort(prev: string, next: string): string {
   return str + String.fromCharCode(Math.ceil((p + n) / 2));
 }
 
-interface Sortable {
+interface SortableEntity {
   id: number;
-  lexical_order: string;
+  lexical_order: LexicalOrder;
 }
 
 /**
@@ -126,7 +128,7 @@ interface Sortable {
  * @param order
  * @returns
  */
-export function lexicallySortEntities<T extends Sortable>(
+export function lexicallySortEntities<T extends SortableEntity>(
   entities: T[],
   order: 'ASC' | 'DESC'
 ): T[] {
@@ -138,29 +140,66 @@ export function lexicallySortEntities<T extends Sortable>(
 }
 
 /**
- *
- * @param sortedEntities the SORTED array of sibling entities
+ * Given the entity's ID and the position you want to position it into this will
+ * return what lexical order string it should get to sort in the correct slot
+ * within the provided sorted Entities.
+ * @param sortedEntities the SORTED array of sibling Entities
  * @param id the id of the entity you're trying to position
- * @param position
+ * @param position if set to a negative number it will place it at the end
  * @returns the new lexical_order the entity should use.
  */
-export function repositionEntity<T extends Sortable>(
+export function positionEntity<T extends SortableEntity>(
   sortedEntities: T[],
   id: number,
   position: number
-): string {
+): LexicalOrder {
   let prevLex = '';
   let nextLex = '';
 
-  if (position >= sortedEntities.length) {
+  // Check to see if the Entity with given id is already present in the array.
+  const currentPosition = sortedEntities.findIndex(
+    (entity) => entity.id === id
+  );
+
+  // Handle position of -1. But if the Entity is present AND last in the array
+  // set it to its current position so as to not needlessly change the order.
+  let newPosition =
+    position < 0
+      ? currentPosition === sortedEntities.length - 1
+        ? currentPosition
+        : sortedEntities.length
+      : position;
+
+  /**
+   * If we're moving an Entity that is already in this list we must take an
+   * extra step if we're moving it to a position further down the list. Why?
+   * Well, imagine if we had three Entities [I, III, III]. If we say we want
+   * to move I to be second in the list and become [II, I, III] we would want to
+   * tell this function to "move I to new position 1". Well, what's really going
+   * to happen is it'll look at the array of [I, II, III] and go "okay, let's
+   * place I after I and before II". Becoming [I, II, III].
+   * [[Record scratch]]
+   * "Wait a second! It didn't move!" You say, "you mean it'll try to place 'I'
+   * behind itself??!!"
+   * That's right! So, when moving (as opposed to inserting) an Entity to be
+   * later in the order we need to bump that new position by 1 extra so it can
+   * go after its past self.
+   * So, with this in place, it'll move "I" not to position 1, but to position 2
+   * to be behind II and before III. Becoming [II, I, III].
+   */
+  if (currentPosition !== -1 && currentPosition < newPosition) {
+    ++newPosition;
+  }
+
+  if (newPosition >= sortedEntities.length) {
     prevLex = sortedEntities[sortedEntities.length - 1].lexical_order;
-  } else if (sortedEntities[position].id === id) {
-    return sortedEntities[position].lexical_order;
-  } else if (position === 0) {
+  } else if (sortedEntities[newPosition].id === id) {
+    return sortedEntities[newPosition].lexical_order;
+  } else if (newPosition === 0) {
     nextLex = sortedEntities[0].lexical_order;
   } else {
-    prevLex = sortedEntities[position - 1].lexical_order;
-    nextLex = sortedEntities[position].lexical_order;
+    prevLex = sortedEntities[newPosition - 1].lexical_order;
+    nextLex = sortedEntities[newPosition].lexical_order;
   }
 
   return insertLexicalSort(prevLex, nextLex);

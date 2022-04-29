@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 
 import { Task } from '../../task/entities/task.entity';
+import { LexicalOrder } from '../../types/entity.types';
 
 /**
  * Here I've chosen to use TypeORM's Data Mapper approach to spread things out.
@@ -28,8 +29,8 @@ export class Category {
   })
   tasks: Task[];
 
-  @Column({ nullable: false })
-  lexical_order: string;
+  @Column({ nullable: false, type: 'varchar' })
+  lexical_order: LexicalOrder;
 
   @CreateDateColumn({ nullable: false })
   created_at: Date;

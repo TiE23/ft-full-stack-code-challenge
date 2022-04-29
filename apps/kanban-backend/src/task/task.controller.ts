@@ -31,15 +31,7 @@ export class TaskController {
     @Param('categoryId') categoryId: number,
     @Param('position') position: number
   ): Promise<Task> {
-    return this.taskService.changeCategory(taskId, categoryId, position);
-  }
-
-  @Patch(':id/repositionto/:newPosition')
-  reposition(
-    @Param('id') id: number,
-    @Param('newPosition') newPosition: number
-  ): Promise<Task> {
-    return this.taskService.reposition(id, newPosition);
+    return this.taskService.moveAndReposition(taskId, categoryId, position);
   }
 
   @Delete(':id')

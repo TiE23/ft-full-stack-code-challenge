@@ -9,7 +9,7 @@ import { Task } from '../task/entities/task.entity';
 import { CreateTaskDto } from '../task/dto/create-task.dto';
 
 import { EntityNotFoundException } from '../exceptions/EntityNotFoundException';
-import { insertLexicalSort, repositionEntity } from '../utils/common.utils';
+import { insertLexicalSort, positionEntity } from '../utils/common.utils';
 import { lexicallySortEntities } from '../utils/common.utils';
 
 @Injectable()
@@ -116,7 +116,7 @@ export class CategoryService {
     });
 
     // Generate the lexical order string that will sort it between these Categories.
-    targetCategory.lexical_order = repositionEntity<Category>(
+    targetCategory.lexical_order = positionEntity<Category>(
       categories,
       id,
       newPosition

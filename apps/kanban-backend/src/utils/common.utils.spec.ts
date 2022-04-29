@@ -5,7 +5,7 @@ import { categoryFactory } from '../testUtils/category.testUtils';
 import {
   insertLexicalSort,
   lexicallySortEntities,
-  repositionEntity,
+  positionEntity,
 } from './common.utils';
 
 describe('insertLexicalSort()', () => {
@@ -125,50 +125,39 @@ describe('lexicallySortEntities()', () => {
   });
 });
 
-describe('repositionEntity()', () => {
-  describe('repositioning Categories', () => {
-    let testCategories: Category[] = [];
+describe('positionEntity()', () => {
+  describe('inserting Tasks', () => {
+    let testTasks: Task[] = [];
     beforeEach(() => {
-      testCategories = [];
-      testCategories.push(categoryFactory({ id: 0, lexical_order: 'c' }));
-      testCategories.push(categoryFactory({ id: 1, lexical_order: 'e' }));
-      testCategories.push(categoryFactory({ id: 2, lexical_order: 'f' }));
+      testTasks = [];
+      testTasks.push(taskFactory({ id: 0, lexical_order: 'c' }));
+      testTasks.push(taskFactory({ id: 1, lexical_order: 'e' }));
+      testTasks.push(taskFactory({ id: 2, lexical_order: 'f' }));
+      testTasks.push(taskFactory({ id: 3, lexical_order: 'h' }));
     });
 
-    it('should resposition to 0 correctly', () => {
-      const newCategory = categoryFactory({
-        id: 3,
-        lexical_order: 'z',
-      });
-      testCategories.push(newCategory);
-      expect(repositionEntity(testCategories, 3, 0)).toBe('b'); // <b>, c, e, f
+    it('should insert to -1 correctly', () => {
+      expect(positionEntity(testTasks, -1, -1)).toBe('r'); // c, e, f, h, <r>
     });
 
-    it('should resposition to 1 correctly', () => {
-      const newCategory = categoryFactory({
-        id: 3,
-        lexical_order: 'z',
-      });
-      testCategories.push(newCategory);
-      expect(repositionEntity(testCategories, 3, 1)).toBe('d'); // c, <d>, e, f
+    it('should insert to 0 correctly', () => {
+      expect(positionEntity(testTasks, -1, 0)).toBe('b'); // <b>, c, e, f, h
     });
 
-    it('should resposition to 2 correctly', () => {
-      const newCategory = categoryFactory({
-        id: 3,
-        lexical_order: 'z',
-      });
-      testCategories.push(newCategory);
-      expect(repositionEntity(testCategories, 3, 2)).toBe('en'); // c, e, <en>, f
+    it('should insert to 1 correctly', () => {
+      expect(positionEntity(testTasks, -1, 1)).toBe('d'); // c, <d>, e, f, h
     });
 
-    it('should resposition to 3 correctly', () => {
-      const newCategory = categoryFactory({
-        id: 3,
-        lexical_order: 'z',
-      });
-      testCategories.push(newCategory);
-      expect(repositionEntity(testCategories, 3, 3)).toBe('z'); // c, e, f, <z> (no change)
+    it('should insert to 2 correctly', () => {
+      expect(positionEntity(testTasks, -1, 2)).toBe('en'); // c, e, <en>, f, h
+    });
+
+    it('should insert to 3 correctly', () => {
+      expect(positionEntity(testTasks, -1, 3)).toBe('g'); // c, e, f, <g>, h
+    });
+
+    it('should insert to 4 correctly', () => {
+      expect(positionEntity(testTasks, -1, 4)).toBe('r'); // c, e, f, h, <r>
     });
   });
 
@@ -179,42 +168,116 @@ describe('repositionEntity()', () => {
       testTasks.push(taskFactory({ id: 0, lexical_order: 'c' }));
       testTasks.push(taskFactory({ id: 1, lexical_order: 'e' }));
       testTasks.push(taskFactory({ id: 2, lexical_order: 'f' }));
+      testTasks.push(taskFactory({ id: 2, lexical_order: 'h' }));
     });
 
-    it('should resposition to 0 correctly', () => {
-      const newTask = taskFactory({
-        id: 3,
-        lexical_order: 'z',
-      });
-      testTasks.push(newTask);
-      expect(repositionEntity(testTasks, 3, 0)).toBe('b'); // <b>, c, e, f
+    it('should reposition 0 to 1', () => {
+      expect(positionEntity(testTasks, 0, 1)).toBe('en'); // -c-, e, +e+, f, h
     });
 
-    it('should resposition to 1 correctly', () => {
-      const newTask = taskFactory({
-        id: 3,
-        lexical_order: 'z',
-      });
-      testTasks.push(newTask);
-      expect(repositionEntity(testTasks, 3, 1)).toBe('d'); // c, <d>, e, f
+    it('should reposition 1 to 0', () => {
+      expect(positionEntity(testTasks, 1, 0)).toBe('b'); // +b+, c, -e-, f, h
     });
 
-    it('should resposition to 2 correctly', () => {
-      const newTask = taskFactory({
-        id: 3,
-        lexical_order: 'z',
-      });
-      testTasks.push(newTask);
-      expect(repositionEntity(testTasks, 3, 2)).toBe('en'); // c, e, <en>, f
+    it('should reposition 0 to 2', () => {
+      expect(positionEntity(testTasks, 0, 2)).toBe('g'); // -c-, e, f, +g+, h
     });
 
-    it('should resposition to 3 correctly', () => {
-      const newTask = taskFactory({
-        id: 3,
-        lexical_order: 'z',
-      });
-      testTasks.push(newTask);
-      expect(repositionEntity(testTasks, 3, 3)).toBe('z'); // c, e, f, <z> (no change)
+    it('should reposition 2 to 0', () => {
+      expect(positionEntity(testTasks, 2, 0)).toBe('b'); // +b+, c, -e-, f, h
+    });
+
+    it('should reposition 0 to 3', () => {
+      expect(positionEntity(testTasks, 0, 3)).toBe('r'); // -c-, e, f, h, +r+
+    });
+
+    it('should reposition 3 to 0', () => {
+      expect(positionEntity(testTasks, 3, 0)).toBe('b'); // +b+, c, e, f, -h-
+    });
+
+    it('should reposition 1 to 2', () => {
+      expect(positionEntity(testTasks, 1, 2)).toBe('g'); // c, -e-, f, +g+, h
+    });
+
+    it('should reposition 2 to 1', () => {
+      expect(positionEntity(testTasks, 2, 1)).toBe('d'); // c, +d+, e, -f-, h
+    });
+  });
+  describe('inserting Categories', () => {
+    let testCategories: Category[] = [];
+    beforeEach(() => {
+      testCategories = [];
+      testCategories.push(categoryFactory({ id: 0, lexical_order: 'c' }));
+      testCategories.push(categoryFactory({ id: 1, lexical_order: 'e' }));
+      testCategories.push(categoryFactory({ id: 2, lexical_order: 'f' }));
+      testCategories.push(categoryFactory({ id: 3, lexical_order: 'h' }));
+    });
+
+    it('should insert to -1 correctly', () => {
+      expect(positionEntity(testCategories, -1, -1)).toBe('r'); // c, e, f, h, <r>
+    });
+
+    it('should insert to 0 correctly', () => {
+      expect(positionEntity(testCategories, -1, 0)).toBe('b'); // <b>, c, e, f, h
+    });
+
+    it('should insert to 1 correctly', () => {
+      expect(positionEntity(testCategories, -1, 1)).toBe('d'); // c, <d>, e, f, h
+    });
+
+    it('should insert to 2 correctly', () => {
+      expect(positionEntity(testCategories, -1, 2)).toBe('en'); // c, e, <en>, f, h
+    });
+
+    it('should insert to 3 correctly', () => {
+      expect(positionEntity(testCategories, -1, 3)).toBe('g'); // c, e, f, <g>, h
+    });
+
+    it('should insert to 4 correctly', () => {
+      expect(positionEntity(testCategories, -1, 4)).toBe('r'); // c, e, f, h, <r>
+    });
+  });
+
+  describe('repositioning Categories', () => {
+    let testCategories: Category[] = [];
+    beforeEach(() => {
+      testCategories = [];
+      testCategories.push(categoryFactory({ id: 0, lexical_order: 'c' }));
+      testCategories.push(categoryFactory({ id: 1, lexical_order: 'e' }));
+      testCategories.push(categoryFactory({ id: 2, lexical_order: 'f' }));
+      testCategories.push(categoryFactory({ id: 3, lexical_order: 'h' }));
+    });
+
+    it('should reposition 0 to 1', () => {
+      expect(positionEntity(testCategories, 0, 1)).toBe('en'); // -c-, e, +e+, f, h
+    });
+
+    it('should reposition 1 to 0', () => {
+      expect(positionEntity(testCategories, 1, 0)).toBe('b'); // +b+, c, -e-, f, h
+    });
+
+    it('should reposition 0 to 2', () => {
+      expect(positionEntity(testCategories, 0, 2)).toBe('g'); // -c-, e, f, +g+, h
+    });
+
+    it('should reposition 2 to 0', () => {
+      expect(positionEntity(testCategories, 2, 0)).toBe('b'); // +b+, c, -e-, f, h
+    });
+
+    it('should reposition 0 to 3', () => {
+      expect(positionEntity(testCategories, 0, 3)).toBe('r'); // -c-, e, f, h, +r+
+    });
+
+    it('should reposition 3 to 0', () => {
+      expect(positionEntity(testCategories, 3, 0)).toBe('b'); // +b+, c, e, f, -h-
+    });
+
+    it('should reposition 1 to 2', () => {
+      expect(positionEntity(testCategories, 1, 2)).toBe('g'); // c, -e-, f, +g+, h
+    });
+
+    it('should reposition 2 to 1', () => {
+      expect(positionEntity(testCategories, 2, 1)).toBe('d'); // c, +d+, e, -f-, h
     });
   });
 });

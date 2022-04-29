@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 
 import { Category } from '../../category/entities/category.entity';
+import { LexicalOrder } from '../../types/entity.types';
 
 @Entity()
 export class Task {
@@ -24,8 +25,8 @@ export class Task {
   })
   category: Category;
 
-  @Column({ nullable: false })
-  lexical_order: string;
+  @Column({ nullable: false, type: 'varchar' })
+  lexical_order: LexicalOrder;
 
   @CreateDateColumn({ nullable: false })
   created_at: Date;
