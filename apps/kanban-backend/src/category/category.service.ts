@@ -14,7 +14,6 @@ import {
   positionEntity,
   lexicallySortEntities,
 } from '../utils/common.utils';
-import { sortTasksInCategory } from '../utils/category.utils';
 
 @Injectable()
 export class CategoryService {
@@ -57,7 +56,9 @@ export class CategoryService {
     });
 
     // Sort Category's Tasks before returning.
-    categories.forEach((category) => sortTasksInCategory(category, 'ASC'));
+    categories.forEach((category) => {
+      category.tasks = lexicallySortEntities(category.tasks, 'ASC');
+    });
     return categories;
   }
 
@@ -78,7 +79,7 @@ export class CategoryService {
     }
 
     // Sort Category's Tasks before returning.
-    sortTasksInCategory(category, 'ASC');
+    category.tasks = lexicallySortEntities(category.tasks, 'ASC');
     return category;
   }
 
@@ -108,7 +109,7 @@ export class CategoryService {
     });
 
     // Sort Category's Tasks before returning.
-    sortTasksInCategory(updatedCategory, 'ASC');
+    updatedCategory.tasks = lexicallySortEntities(updatedCategory.tasks, 'ASC');
     return updatedCategory;
   }
 
@@ -145,7 +146,7 @@ export class CategoryService {
     );
 
     // Sort Category's Tasks before returning.
-    sortTasksInCategory(updatedCategory, 'ASC');
+    updatedCategory.tasks = lexicallySortEntities(updatedCategory.tasks, 'ASC');
     return updatedCategory;
   }
 
@@ -189,7 +190,7 @@ export class CategoryService {
     );
 
     // Sort Category's Tasks before returning.
-    sortTasksInCategory(updatedCategory, 'ASC');
+    updatedCategory.tasks = lexicallySortEntities(updatedCategory.tasks, 'ASC');
     return updatedCategory;
   }
 

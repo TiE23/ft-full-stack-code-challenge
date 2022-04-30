@@ -7,8 +7,8 @@ import * as supertest from 'supertest';
 import { makeDatabase } from '../app/database';
 import { CategoryService } from './category.service';
 import { CategoryEntity } from './entities/category.entity';
-import { CreateCategoryDto } from './dto/create-category.dto';
 import { CategoryModule } from './category.module';
+import { TaskModule } from '../task/task.module';
 import { configureApp } from '../utils/configureApp';
 
 describe('Category e2e tests', () => {
@@ -21,12 +21,13 @@ describe('Category e2e tests', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         CategoryModule,
+        TaskModule,
         TypeOrmModule.forRoot(makeDatabase(':memory:')),
       ],
     }).compile();
 
     app = module.createNestApplication();
-    configureApp(app, 'test');
+    configureApp(app, 'api');
     await app.init();
 
     categoriesRepository = app.get(getRepositoryToken(CategoryEntity));
@@ -63,7 +64,7 @@ describe('Category e2e tests', () => {
 
       it('should create a Category', async () => {
         await supertest(app.getHttpServer())
-          .post('/test/category')
+          .post('/api/category')
           .send({ title: 'Category 1' })
           .expect(201)
           .expect((res) => {
@@ -77,7 +78,7 @@ describe('Category e2e tests', () => {
 
       it('should create a second Category', async () => {
         await supertest(app.getHttpServer())
-          .post('/test/category')
+          .post('/api/category')
           .send({ title: 'Category 2' })
           .expect(201)
           .expect((res) => {
@@ -102,7 +103,7 @@ describe('Category e2e tests', () => {
 
       it('should find the Categories that were created', async () => {
         await supertest(app.getHttpServer())
-          .get('/test/category')
+          .get('/api/category')
           .expect(200)
           .expect((res) => {
             expect(res.body.length).toEqual(2);
@@ -132,7 +133,7 @@ describe('Category e2e tests', () => {
 
       it('should find a specific Category', async () => {
         await supertest(app.getHttpServer())
-          .get('/test/category/1')
+          .get('/api/category/1')
           .expect(200)
           .expect((res) => {
             expect(res.body).toEqual({
@@ -159,7 +160,7 @@ describe('Category e2e tests', () => {
 
       it('should update a specific Category', async () => {
         await supertest(app.getHttpServer())
-          .patch('/test/category/1')
+          .patch('/api/category/1')
           .send({ title: 'Updated Title' })
           .expect(200)
           .expect((res) => {
@@ -185,7 +186,7 @@ describe('Category e2e tests', () => {
          * is less than 'n'.
          */
         await supertest(app.getHttpServer())
-          .patch('/test/category/3/repositionto/0')
+          .patch('/api/category/3/repositionto/0')
           .expect(200)
           .expect((res) => {
             expect(res.body.lexical_order < 'n').toBe(true);
@@ -198,11 +199,76 @@ describe('Category e2e tests', () => {
          * Retrieve the Categories, which should now be ordered
          */
         await supertest(app.getHttpServer())
-          .get('/test/category')
+          .get('/api/category')
           .expect((res) => {
             expect(res.body[0].id).toBe(3);
             expect(res.body[1].id).toBe(1);
             expect(res.body[2].id).toBe(2);
+          });
+      });
+    });
+
+    describe('POST /category/:id/addtask; addTask()', () => {
+      beforeAll(async () => {
+        // Seed with three Categories.
+        await seedCategories(3);
+      });
+
+      afterAll(async () => {
+        await resetCategoriesTable();
+      });
+
+      it('should add a new Task to a targeted Category', async () => {
+        await supertest(app.getHttpServer())
+          .post('/api/category/1/addtask')
+          .send({ title: 'Task 1.1' })
+          .expect(201)
+          .expect((res) => {
+            expect(res.body.tasks.length).toBe(1);
+            expect(res.body.tasks[0].title).toBe('Task 1.1');
+          });
+      });
+
+      it('should add a second new Task to a targeted Category', async () => {
+        await supertest(app.getHttpServer())
+          .post('/api/category/1/addtask')
+          .send({ title: 'Task 1.2' })
+          .expect(201)
+          .expect((res) => {
+            expect(res.body.tasks.length).toBe(2);
+            expect(res.body.tasks[0].title).toBe('Task 1.1');
+            expect(res.body.tasks[1].title).toBe('Task 1.2');
+            expect(
+              res.body.tasks[0].lexical_order < res.body.tasks[1].lexical_order
+            ).toBe(true);
+          });
+      });
+    });
+    describe('DELETE /category/:id; delete()', () => {
+      beforeAll(async () => {
+        // Seed with one Category.
+        await seedCategories(1);
+      });
+
+      afterAll(async () => {
+        await resetCategoriesTable();
+      });
+
+      it('should delete a Category', async () => {
+        await supertest(app.getHttpServer())
+          .delete('/api/category/1')
+          .expect(200)
+          .expect((res) => {
+            expect(res.body.affected).toBe(1);
+          });
+      });
+
+      it('should return 200 trying to delete a non-existant Category', async () => {
+        await supertest(app.getHttpServer())
+          .delete('/api/category/999')
+          .expect(200)
+          .expect((res) => {
+            expect(res.body.affected).toBe(0);
           });
       });
     });
