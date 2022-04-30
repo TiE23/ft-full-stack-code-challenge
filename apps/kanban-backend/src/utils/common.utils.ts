@@ -157,6 +157,10 @@ export function positionEntity<T extends SortableEntity>(
   let prevLex = '';
   let nextLex = '';
 
+  if (sortedEntities.length === 0) {
+    return findLexicalPosition(prevLex, nextLex);
+  }
+
   // Check to see if the Entity with given id is already present in the array.
   const currentPosition = sortedEntities.findIndex(
     (entity) => entity.id === id

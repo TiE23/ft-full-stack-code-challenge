@@ -140,6 +140,14 @@ describe('positionEntity()', () => {
       testTasks.push(taskFactory({ id: 3, lexical_order: 'h' }));
     });
 
+    it('should insert to an empty array', () => {
+      expect(positionEntity([], -1, -1)).toBe('n');
+    });
+
+    it('should handle inserting beyond the array edge', () => {
+      expect(positionEntity([], -1, 100)).toBe('n');
+    });
+
     it('should insert to -1 correctly', () => {
       expect(positionEntity(testTasks, -1, -1)).toBe('r'); // c, e, f, h, <r>
     });
@@ -173,6 +181,10 @@ describe('positionEntity()', () => {
       testTasks.push(taskFactory({ id: 1, lexical_order: 'e' }));
       testTasks.push(taskFactory({ id: 2, lexical_order: 'f' }));
       testTasks.push(taskFactory({ id: 2, lexical_order: 'h' }));
+    });
+
+    it('should reposition 5 to 3 on empty array', () => {
+      expect(positionEntity([], 5, 3)).toBe('n');
     });
 
     it('should reposition 0 to 1', () => {
@@ -217,6 +229,14 @@ describe('positionEntity()', () => {
       testCategories.push(categoryFactory({ id: 3, lexical_order: 'h' }));
     });
 
+    it('should insert to an empty array', () => {
+      expect(positionEntity([], -1, -1)).toBe('n');
+    });
+
+    it('should handle inserting beyond the array edge', () => {
+      expect(positionEntity([], -1, 100)).toBe('n');
+    });
+
     it('should insert to -1 correctly', () => {
       expect(positionEntity(testCategories, -1, -1)).toBe('r'); // c, e, f, h, <r>
     });
@@ -250,6 +270,10 @@ describe('positionEntity()', () => {
       testCategories.push(categoryFactory({ id: 1, lexical_order: 'e' }));
       testCategories.push(categoryFactory({ id: 2, lexical_order: 'f' }));
       testCategories.push(categoryFactory({ id: 3, lexical_order: 'h' }));
+    });
+
+    it('should reposition 5 to 3 on empty array', () => {
+      expect(positionEntity([], 5, 3)).toBe('n');
     });
 
     it('should reposition 0 to 1', () => {
