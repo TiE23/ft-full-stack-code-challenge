@@ -9,6 +9,10 @@ Hey Jamie and the rest of the Flashtract family. Here's just some of my own note
 
 ## About the Back End
 
+I wrote this app using Node v16.13.0. So, if something goes wrong, that's probably the reason. ;)
+
+## Daily Notes
+
 These aren't important to read, they were mostly for myself. This was a learning experience where I used a number of new libraries, after all!
 
 ### Thursday Notes

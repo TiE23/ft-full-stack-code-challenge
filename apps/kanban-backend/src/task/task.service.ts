@@ -34,10 +34,18 @@ export class TaskService {
     }
 
     await this.tasksRepository.update({ id }, updateTaskDto);
-    return await this.tasksRepository.findOne({
-      where: { id },
+
+    // Return the newly updated Task so that we can get updated Category relation.
+    const updatedTask = await this.tasksRepository.findOne(targetTask.id, {
       relations: ['category'],
     });
+
+    // Sort parent Category's Tasks before returning.
+    updatedTask.category.tasks = lexicallySortEntities(
+      updatedTask.category.tasks,
+      'ASC'
+    );
+    return updatedTask;
   }
 
   /**
@@ -91,9 +99,16 @@ export class TaskService {
     await this.tasksRepository.update({ id: taskId }, targetTask);
 
     // Return the newly updated Task so that we can get updated Category relation.
-    return await this.tasksRepository.findOne(targetTask.id, {
+    const updatedTask = await this.tasksRepository.findOne(targetTask.id, {
       relations: ['category'],
     });
+
+    // Sort parent Category's Tasks before returning.
+    updatedTask.category.tasks = lexicallySortEntities(
+      updatedTask.category.tasks,
+      'ASC'
+    );
+    return updatedTask;
   }
 
   /**
