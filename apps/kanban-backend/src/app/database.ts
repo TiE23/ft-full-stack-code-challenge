@@ -7,7 +7,9 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
  */
 export function makeDatabase(database: string): TypeOrmModuleOptions {
   return {
-    entities: ['src/**/*.entity.ts'],
+    // entities: ['src/**/*.entity.ts'],
+    // e2e testing is impossible otherwise https://stackoverflow.com/a/68080829/3120546
+    entities: [__dirname + '/../**/*.entity.ts'],
     autoLoadEntities: true,
     synchronize: true,
     database,

@@ -5,7 +5,7 @@ Hey Jamie and the rest of the Flashtract family. Here's just some of my own note
 - On Tueday I was given the assignment and read the general description and little else
 - On Wednesday I studied up on NestJS, TypeORM, SQLite, and React-Query
 - On Thursday I started writing the backend. I ran into a lot of friction just trying to get TypeORM to behave within NestJS but by the end of the day I was starting to stretch my legs
-- On Friday I polished the backend and made some design changes
+- On Friday I finished the backend and made some design changes. Then started writing unit tests for the back end.
 
 ## About the Back End
 
@@ -37,3 +37,5 @@ These aren't important to read, they were mostly for myself. This was a learning
 8. The Backend is pretty much finished (discounting any "oh, I didn't think of that" adjustments after the fact when working on the Frontend). Now, time to write some tests... let's see how this goes...
 9. Oh wow, this is proving to be really annoying. Finding sample solutions online and consulting documentation and everything isn't yielding the secret as I try and just prepare a TestingModule in the Category controller. This is disheartening...
 10. Thank you to a random dude on StackOverflow. Turns out I needed to fully mock out the CategoryService otherwise TypeORM would try and get to the database despite the fact I wasn't attempting to do e2e.
+11. Trying to configure e2e tests for Categories now. Was stuck for a long time until Googling around long enough left me to attempt a seemingly [unrelated fix](https://stackoverflow.com/a/68080829/3120546) that ended up working to unblock me. Now I just need to deal with the fact that apparently my API routes aren't working and can't be tested with supertest.
+12. Oh my god, I managed to get through all the issues. What a learning experience! Now I have working e2e tests for Categories. Will finish writing them later and then write them for Tasks, which shouldn't take any time at all.
