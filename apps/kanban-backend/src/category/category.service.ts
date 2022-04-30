@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Repository } from 'typeorm';
+import { DeleteResult, QueryFailedError, Repository } from 'typeorm';
 
 import { CategoryEntity } from './entities/category.entity';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -39,10 +39,18 @@ export class CategoryService {
         ? findLexicalPosition(categories[0].lexical_order, '')
         : findLexicalPosition('', '');
 
-    return await this.categoriesRepository.save({
-      ...createCategoryDto,
-      lexical_order: lexicalOrder,
-    });
+    try {
+      return await this.categoriesRepository.save({
+        ...createCategoryDto,
+        lexical_order: lexicalOrder,
+      });
+    } catch (e) {
+      if (e instanceof QueryFailedError && e.message.includes('UNIQUE')) {
+        // Titles must be unique.
+        throw new ConflictException(e.message);
+      }
+      throw new Error(e.message);
+    }
   }
 
   /**

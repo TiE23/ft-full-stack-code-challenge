@@ -8,6 +8,7 @@ export function configureApp(
     new ValidationPipe({
       transform: true,
       whitelist: true,
+      forbidNonWhitelisted: true,
     })
   );
 

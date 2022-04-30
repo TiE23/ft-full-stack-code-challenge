@@ -12,7 +12,7 @@ import { TaskModule } from '../task/task.module';
 import { configureApp } from '../utils/configureApp';
 import { TaskEntity } from './entities/task.entity';
 
-describe('Category e2e tests', () => {
+describe('Task e2e tests', () => {
   let app: INestApplication;
   let categoriesRepository: Repository<CategoryEntity>;
   let categoriesService: CategoryService;
@@ -69,7 +69,7 @@ describe('Category e2e tests', () => {
     }
   };
 
-  describe('happy path updating, moving, and deleting Tasks', () => {
+  describe('happy path', () => {
     describe('PATCH /task/:id; update()', () => {
       beforeAll(async () => {
         // Create a Category with three Tasks.
@@ -177,7 +177,7 @@ describe('Category e2e tests', () => {
 
     describe('DELETE /task/:id; delete()', () => {
       beforeAll(async () => {
-        // Create a Category with a Task.
+        // Create a Category with one Task.
         await seedTasks(1, 1);
       });
 
@@ -194,13 +194,71 @@ describe('Category e2e tests', () => {
           });
       });
 
-      it('should return 200 trying to delete a non-existant Task', async () => {
+      it('should respond 200 trying to delete a non-existant Task', async () => {
         await supertest(app.getHttpServer())
           .delete('/api/task/55')
           .expect(200)
           .expect((res) => {
             expect(res.body.affected).toBe(0);
           });
+      });
+    });
+  });
+
+  describe('unhappy path', () => {
+    describe('PATCH /task/:id; update()', () => {
+      beforeAll(async () => {
+        // Create a Category with one Task.
+        await seedTasks(1, 1);
+      });
+
+      afterAll(async () => {
+        await resetDatabase();
+      });
+
+      describe('given a Task that does not exist', () => {
+        it('should respond 404 trying to update of Task that does not exist', async () => {
+          await supertest(app.getHttpServer())
+            .patch('/api/task/99')
+            .send({ title: 'Updated Task 1.1' })
+            .expect(404)
+            .expect((res) => {
+              expect(res.body.message).toMatch(/Task.*99/);
+            });
+        });
+      });
+    });
+
+    describe('PATCH /task/:taskId/moveto/:categoryId/:position; moveAndReposition()', () => {
+      beforeEach(async () => {
+        // Create 3 Categories with three Tasks each.
+        await seedTasks(3, 3);
+      });
+
+      afterEach(async () => {
+        await resetDatabase();
+      });
+
+      describe('given a Task that does not exist', () => {
+        it('should respond 404 (not found)', async () => {
+          await supertest(app.getHttpServer())
+            .patch('/api/task/99/moveto/1/0')
+            .expect(404)
+            .expect((res) => {
+              expect(res.body.message).toMatch(/Task.*99/);
+            });
+        });
+      });
+
+      describe('given a Category that does not exist', () => {
+        it('should respond 404 (not found)', async () => {
+          await supertest(app.getHttpServer())
+            .patch('/api/task/1/moveto/99/0')
+            .expect(404)
+            .expect((res) => {
+              expect(res.body.message).toMatch(/Category.*99/);
+            });
+        });
       });
     });
   });

@@ -56,7 +56,7 @@ describe('Category e2e tests', () => {
     }
   };
 
-  describe('happy path creating, reading, updating, and deleting Categories', () => {
+  describe('happy path', () => {
     describe('POST /category; create()', () => {
       afterAll(async () => {
         await resetCategoriesTable();
@@ -263,13 +263,154 @@ describe('Category e2e tests', () => {
           });
       });
 
-      it('should return 200 trying to delete a non-existant Category', async () => {
+      it('should respond 200 trying to delete a non-existant Category', async () => {
         await supertest(app.getHttpServer())
           .delete('/api/category/999')
           .expect(200)
           .expect((res) => {
             expect(res.body.affected).toBe(0);
           });
+      });
+    });
+  });
+
+  describe('unhappy path', () => {
+    describe('POST /category; create()', () => {
+      afterEach(async () => {
+        await resetCategoriesTable();
+      });
+
+      describe('given a malformed input', () => {
+        it('should respond 400 (bad request)', async () => {
+          await supertest(app.getHttpServer())
+            .post('/api/category')
+            .send({ foo: 'bar' })
+            .expect(400);
+        });
+      });
+
+      describe('given a repeated Category title', () => {
+        beforeAll(async () => {
+          await seedCategories(1);
+        });
+
+        it('should respond 409 (conflicted)', async () => {
+          await supertest(app.getHttpServer())
+            .post('/api/category')
+            .send({ title: 'Category 1' })
+            .expect(409);
+        });
+      });
+    });
+
+    describe('GET /category/:id; findOne()', () => {
+      beforeAll(async () => {
+        // Seed with one Category.
+        await seedCategories(1);
+      });
+
+      afterAll(async () => {
+        await resetCategoriesTable();
+      });
+
+      describe('given a Category that does not exist', () => {
+        it('should respond 404 (not found)', async () => {
+          await supertest(app.getHttpServer())
+            .get('/api/category/99')
+            .expect(404);
+        });
+      });
+    });
+
+    describe('POST /category/:id; update()', () => {
+      beforeAll(async () => {
+        // Seed with one Category.
+        await seedCategories(1);
+      });
+
+      afterAll(async () => {
+        await resetCategoriesTable();
+      });
+
+      describe('given a Category that does not exist', () => {
+        it('should respond 404 (not found)', async () => {
+          await supertest(app.getHttpServer())
+            .patch('/api/category/99')
+            .send({ title: 'Updated Title' })
+            .expect(404)
+            .expect((res) => {
+              expect(res.body.message).toMatch(/Category.*99/);
+            });
+        });
+      });
+
+      describe('given malformed input', () => {
+        it('should respond 400 (bad request)', async () => {
+          await supertest(app.getHttpServer())
+            .patch('/api/category/1')
+            .send({ foo: 'bar' })
+            .expect(400)
+            .expect((res) => {
+              expect(res.body.message[0]).toMatch(/foo should not exist/);
+            });
+        });
+      });
+    });
+
+    describe('PATCH /category/:id/repositionto/:newPosition; reposition()', () => {
+      beforeAll(async () => {
+        // Seed with three Categories.
+        await seedCategories(3);
+      });
+
+      afterAll(async () => {
+        await resetCategoriesTable();
+      });
+
+      describe('given a Category that does not exist', () => {
+        it('should respond 404 (not found)', async () => {
+          await supertest(app.getHttpServer())
+            .patch('/api/category/99/repositionto/0')
+            .expect(404)
+            .expect((res) => {
+              expect(res.body.message).toMatch(/Category.*99/);
+            });
+        });
+      });
+    });
+
+    describe('POST /category/:id/addtask; addTask()', () => {
+      beforeAll(async () => {
+        // Seed with three Categories.
+        await seedCategories(3);
+      });
+
+      afterAll(async () => {
+        await resetCategoriesTable();
+      });
+
+      describe('given a Category that does not exist', () => {
+        it('should respond 404 (not found)', async () => {
+          await supertest(app.getHttpServer())
+            .post('/api/category/99/addtask')
+            .send({ title: 'Task 1.1' })
+            .expect(404)
+            .expect((res) => {
+              expect(res.body.message).toMatch(/Category.*99/);
+            });
+        });
+      });
+
+      describe('given malformed data for the Task', () => {
+        it('should respond 404 (not found)', async () => {
+          await supertest(app.getHttpServer())
+            .post('/api/category/1/addtask')
+            .send({ foo: 'bar' })
+            .expect(400)
+            .expect((res) => {
+              expect(res.body.message[0]).toMatch(/foo should not exist/);
+            });
+        });
       });
     });
   });
