@@ -1,10 +1,21 @@
-import { StyledCategory } from './Category.styles';
+import { CategoryEntity } from '../../types/entity.types';
+import { Task } from '../Task';
+import { CategoryContainer, CategoryTitle, TasksList } from './Category.styles';
 
-export function Category() {
+interface CategoryProps {
+  category: CategoryEntity;
+}
+export function Category({ category }: CategoryProps) {
+  console.table(category);
   return (
-    <StyledCategory>
-      <h1>Welcome to Category!</h1>
-    </StyledCategory>
+    <CategoryContainer>
+      <CategoryTitle>{category.title}</CategoryTitle>
+      <TasksList>
+        {category.tasks.map((task) => (
+          <Task key={task.id} task={task} />
+        ))}
+      </TasksList>
+    </CategoryContainer>
   );
 }
 

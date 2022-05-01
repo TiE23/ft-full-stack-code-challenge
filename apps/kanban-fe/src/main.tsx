@@ -1,18 +1,21 @@
-import {StrictMode} from 'react';
+import { StrictMode } from 'react';
 import * as ReactDOM from 'react-dom';
-import {QueryClient, QueryClientProvider} from 'react-query'
-import {ChakraProvider} from '@chakra-ui/react'
-import App from "./App";
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { ThemeProvider } from 'styled-components/macro';
+
+import App from './App';
+import { GlobalStyle, theme } from './theme';
 
 const queryClient = new QueryClient();
 
 ReactDOM.render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <ChakraProvider>
-        <App/>
-      </ChakraProvider>
-    </QueryClientProvider>
+    <ThemeProvider theme={theme}>
+      <GlobalStyle theme={theme} />
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
+    </ThemeProvider>
   </StrictMode>,
   document.getElementById('root')
 );
