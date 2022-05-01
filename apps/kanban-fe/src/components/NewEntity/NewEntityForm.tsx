@@ -1,23 +1,21 @@
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 import { useMutation, useQueryClient } from 'react-query';
+
 import {
   addTask,
   addTaskVariables,
   createCategory,
   createCategoryVariables,
 } from '../../api/category.api';
-
 import useFocus from '../../hooks/useFocus';
 import { EntityType } from '../../types/api.types';
-import {
-  CategoryEntity,
-  CreateCategoryDto,
-  EntityId,
-} from '../../types/entity.types';
+import { CategoryEntity, EntityId } from '../../types/entity.types';
 import {
   createOptimisticCategory,
   createOptimisticTask,
 } from '../../utils/entity.utils';
+
 import { NewEntityCreateButton, NewEntityInput } from './NewEntity.styles';
 
 export interface NewEntityFormProps {
@@ -69,14 +67,18 @@ export function NewEntityForm({
           context.previousCategories
         );
       }
-      // TODO HANDLE ERROR
-      if (err) {
-        console.error(err);
-      }
+      toast.error(
+        `An error occurred while adding a new Category${
+          err ? `\n${String(err)}` : ''
+        }`
+      );
     },
     // Always refetch after error or success.
     onSettled: () => {
       queryClient.invalidateQueries('categories');
+    },
+    onSuccess: (data) => {
+      toast.success(`Category "${data.title}" created!`);
     },
   });
 
@@ -118,13 +120,19 @@ export function NewEntityForm({
           context.previousCategories
         );
       }
-      // TODO HANDLE ERROR
-      if (err) {
-        console.error(err);
-      }
+      toast.error(
+        `An error occurred while adding a new Category${
+          err ? `\n${String(err)}` : ''
+        }`
+      );
     },
     onSettled: () => {
       queryClient.invalidateQueries('categories');
+    },
+    onSuccess: (data) => {
+      toast.success(
+        `Task "${data.tasks[data.tasks.length - 1].title}" created!`
+      );
     },
   });
 
