@@ -298,7 +298,10 @@ describe('Category e2e tests', () => {
           await supertest(app.getHttpServer())
             .post('/api/category')
             .send({ title: 'Category 1' })
-            .expect(409);
+            .expect(409)
+            .expect((res) => {
+              expect(res.body.message).toContain('UNIQUE constraint failed');
+            });
         });
       });
     });
@@ -325,7 +328,7 @@ describe('Category e2e tests', () => {
     describe('POST /category/:categoryId; update()', () => {
       beforeAll(async () => {
         // Seed with one Category.
-        await seedCategories(1);
+        await seedCategories(2);
       });
 
       afterAll(async () => {
@@ -352,6 +355,18 @@ describe('Category e2e tests', () => {
             .expect(400)
             .expect((res) => {
               expect(res.body.message[0]).toMatch(/foo should not exist/);
+            });
+        });
+      });
+
+      describe('given a title that is already used by another Category', () => {
+        it('should respond 409 (conflicted)', async () => {
+          await supertest(app.getHttpServer())
+            .patch('/api/category/1')
+            .send({ title: 'Category 2' })
+            .expect(409)
+            .expect((res) => {
+              expect(res.body.message).toContain('UNIQUE constraint failed');
             });
         });
       });

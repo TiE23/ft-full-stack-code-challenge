@@ -110,15 +110,26 @@ export class CategoryService {
       throw new EntityNotFoundException('Category', id);
     }
 
-    // Save the Category.
-    const updatedCategory = await this.categoriesRepository.save({
-      ...targetCategory,
-      ...updateCategoryDto,
-    });
+    try {
+      // Save the Category.
+      const updatedCategory = await this.categoriesRepository.save({
+        ...targetCategory,
+        ...updateCategoryDto,
+      });
 
-    // Sort Category's Tasks before returning.
-    updatedCategory.tasks = lexicallySortEntities(updatedCategory.tasks, 'ASC');
-    return updatedCategory;
+      // Sort Category's Tasks before returning.
+      updatedCategory.tasks = lexicallySortEntities(
+        updatedCategory.tasks,
+        'ASC'
+      );
+      return updatedCategory;
+    } catch (e) {
+      if (e instanceof QueryFailedError && e.message.includes('UNIQUE')) {
+        // Titles must be unique.
+        throw new ConflictException(e.message);
+      }
+      throw new Error(e.message);
+    }
   }
 
   /**
