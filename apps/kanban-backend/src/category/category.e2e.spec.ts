@@ -121,7 +121,7 @@ describe('Category e2e tests', () => {
       });
     });
 
-    describe('GET /category/:id; findOne()', () => {
+    describe('GET /category/:categoryId; findOne()', () => {
       beforeAll(async () => {
         // Seed with one Category.
         await seedCategories(1);
@@ -148,7 +148,7 @@ describe('Category e2e tests', () => {
       });
     });
 
-    describe('POST /category/:id; update()', () => {
+    describe('POST /category/:categoryId; update()', () => {
       beforeAll(async () => {
         // Seed with one Category.
         await seedCategories(1);
@@ -169,7 +169,7 @@ describe('Category e2e tests', () => {
       });
     });
 
-    describe('PATCH /category/:id/repositionto/:newPosition; reposition()', () => {
+    describe('PATCH /category/:categoryId/repositionto/:newPosition; reposition()', () => {
       beforeAll(async () => {
         // Seed with three Categories.
         await seedCategories(3);
@@ -208,7 +208,7 @@ describe('Category e2e tests', () => {
       });
     });
 
-    describe('POST /category/:id/addtask; addTask()', () => {
+    describe('POST /category/:categoryId/addtask; addTask()', () => {
       beforeAll(async () => {
         // Seed with three Categories.
         await seedCategories(3);
@@ -244,7 +244,7 @@ describe('Category e2e tests', () => {
           });
       });
     });
-    describe('DELETE /category/:id; delete()', () => {
+    describe('DELETE /category/:categoryId; delete()', () => {
       beforeAll(async () => {
         // Seed with one Category.
         await seedCategories(1);
@@ -303,7 +303,7 @@ describe('Category e2e tests', () => {
       });
     });
 
-    describe('GET /category/:id; findOne()', () => {
+    describe('GET /category/:categoryId; findOne()', () => {
       beforeAll(async () => {
         // Seed with one Category.
         await seedCategories(1);
@@ -322,7 +322,7 @@ describe('Category e2e tests', () => {
       });
     });
 
-    describe('POST /category/:id; update()', () => {
+    describe('POST /category/:categoryId; update()', () => {
       beforeAll(async () => {
         // Seed with one Category.
         await seedCategories(1);
@@ -357,7 +357,7 @@ describe('Category e2e tests', () => {
       });
     });
 
-    describe('PATCH /category/:id/repositionto/:newPosition; reposition()', () => {
+    describe('PATCH /category/:categoryId/repositionto/:newPosition; reposition()', () => {
       beforeAll(async () => {
         // Seed with three Categories.
         await seedCategories(3);
@@ -379,7 +379,7 @@ describe('Category e2e tests', () => {
       });
     });
 
-    describe('POST /category/:id/addtask; addTask()', () => {
+    describe('POST /category/:categoryId/addtask; addTask()', () => {
       beforeAll(async () => {
         // Seed with three Categories.
         await seedCategories(3);

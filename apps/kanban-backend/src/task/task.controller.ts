@@ -17,25 +17,25 @@ import { TaskEntity } from './entities/task.entity';
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
-  @Patch(':id')
+  @Patch(':taskId')
   update(
-    @Param('id') id: number,
+    @Param('taskId') taskId: number,
     @Body() updateTaskDto: UpdateTaskDto
   ): Promise<TaskEntity> {
-    return this.taskService.update(id, updateTaskDto);
+    return this.taskService.update(taskId, updateTaskDto);
   }
 
-  @Patch(':taskId/moveto/:categoryId/:position')
+  @Patch(':taskId/moveto/:categoryId/:newPosition')
   moveAndReposition(
     @Param('taskId') taskId: number,
     @Param('categoryId') categoryId: number,
-    @Param('position') position: number
+    @Param('newPosition') newPosition: number
   ): Promise<TaskEntity> {
-    return this.taskService.moveAndReposition(taskId, categoryId, position);
+    return this.taskService.moveAndReposition(taskId, categoryId, newPosition);
   }
 
-  @Delete(':id')
-  delete(@Param('id') id: number): Promise<DeleteResult> {
-    return this.taskService.delete(id);
+  @Delete(':taskId')
+  delete(@Param('taskId') taskId: number): Promise<DeleteResult> {
+    return this.taskService.delete(taskId);
   }
 }

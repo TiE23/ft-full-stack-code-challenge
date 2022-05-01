@@ -70,7 +70,7 @@ describe('Task e2e tests', () => {
   };
 
   describe('happy path', () => {
-    describe('PATCH /task/:id; update()', () => {
+    describe('PATCH /task/:taskId; update()', () => {
       beforeAll(async () => {
         // Create a Category with three Tasks.
         await seedTasks(1, 3);
@@ -92,7 +92,7 @@ describe('Task e2e tests', () => {
       });
     });
 
-    describe('PATCH /task/:taskId/moveto/:categoryId/:position; moveAndReposition()', () => {
+    describe('PATCH /task/:taskId/moveto/:categoryId/:newPosition; moveAndReposition()', () => {
       beforeEach(async () => {
         // Create 3 Categories with three Tasks each.
         await seedTasks(3, 3);
@@ -175,7 +175,7 @@ describe('Task e2e tests', () => {
       });
     });
 
-    describe('DELETE /task/:id; delete()', () => {
+    describe('DELETE /task/:taskId; delete()', () => {
       beforeAll(async () => {
         // Create a Category with one Task.
         await seedTasks(1, 1);
@@ -206,7 +206,7 @@ describe('Task e2e tests', () => {
   });
 
   describe('unhappy path', () => {
-    describe('PATCH /task/:id; update()', () => {
+    describe('PATCH /task/:taskId; update()', () => {
       beforeAll(async () => {
         // Create a Category with one Task.
         await seedTasks(1, 1);
@@ -229,7 +229,7 @@ describe('Task e2e tests', () => {
       });
     });
 
-    describe('PATCH /task/:taskId/moveto/:categoryId/:position; moveAndReposition()', () => {
+    describe('PATCH /task/:taskId/moveto/:categoryId/:newPosition; moveAndReposition()', () => {
       beforeEach(async () => {
         // Create 3 Categories with three Tasks each.
         await seedTasks(3, 3);

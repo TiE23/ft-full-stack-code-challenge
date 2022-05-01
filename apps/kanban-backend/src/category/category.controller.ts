@@ -31,37 +31,37 @@ export class CategoryController {
     return this.categoryService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: number): Promise<CategoryEntity> {
-    return this.categoryService.findOne(id);
+  @Get(':categoryId')
+  findOne(@Param('categoryId') categoryId: number): Promise<CategoryEntity> {
+    return this.categoryService.findOne(categoryId);
   }
 
-  @Patch(':id')
+  @Patch(':categoryId')
   update(
-    @Param('id') id: number,
+    @Param('categoryId') categoryId: number,
     @Body() updateCategoryDto: UpdateCategoryDto
   ): Promise<CategoryEntity> {
-    return this.categoryService.update(id, updateCategoryDto);
+    return this.categoryService.update(categoryId, updateCategoryDto);
   }
 
-  @Patch(':id/repositionto/:newPosition')
+  @Patch(':categoryId/repositionto/:newPosition')
   reposition(
-    @Param('id') id: number,
+    @Param('categoryId') categoryId: number,
     @Param('newPosition') newPosition: number
   ): Promise<CategoryEntity> {
-    return this.categoryService.reposition(id, newPosition);
+    return this.categoryService.reposition(categoryId, newPosition);
   }
 
-  @Post(':id/addtask')
+  @Post(':categoryId/addtask')
   addTask(
-    @Param('id') id: number,
+    @Param('categoryId') categoryId: number,
     @Body() createTaskDto: CreateTaskDto
   ): Promise<CategoryEntity> {
-    return this.categoryService.addTask(id, createTaskDto);
+    return this.categoryService.addTask(categoryId, createTaskDto);
   }
 
-  @Delete(':id')
-  delete(@Param('id') id: number): Promise<DeleteResult> {
-    return this.categoryService.delete(id);
+  @Delete(':categoryId')
+  delete(@Param('categoryId') categoryId: number): Promise<DeleteResult> {
+    return this.categoryService.delete(categoryId);
   }
 }

@@ -55,13 +55,13 @@ export class TaskService {
    * inserting the Task between its new siblings.
    * @param taskId
    * @param categoryId
-   * @param position
+   * @param newPosition
    * @returns the Task that was moved with its new lexical_order property
    */
   async moveAndReposition(
     taskId: number,
     categoryId: number,
-    position: number
+    newPosition: number
   ): Promise<TaskEntity> {
     // Get the Task by its ID. Also retrieve its relation to Category, we'll need it.
     const targetTask = await this.tasksRepository.findOne({
@@ -92,7 +92,7 @@ export class TaskService {
     targetTask.lexical_order = positionEntity<TaskEntity>(
       sortedSiblingTasks,
       taskId,
-      position
+      newPosition
     );
 
     // Update the Task. The Cascade option for the Relation will handle the rest.
