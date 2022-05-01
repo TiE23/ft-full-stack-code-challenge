@@ -1,10 +1,15 @@
-import {Heading} from '@chakra-ui/react';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { Board } from './components/Board';
+
+const queryClient = new QueryClient();
 
 const App = () => {
   return (
-    <div>
-      <Heading as={'h1'} size={'xl'}>Hello World</Heading>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <div>
+        <Board />
+      </div>
+    </QueryClientProvider>
   );
 };
 

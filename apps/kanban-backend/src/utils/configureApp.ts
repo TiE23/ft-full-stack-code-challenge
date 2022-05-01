@@ -13,5 +13,8 @@ export function configureApp(
   );
 
   app.setGlobalPrefix(globalPrefix);
-  app.enableCors();
+  app.enableCors({
+    allowedHeaders: ['content-type'],
+    origin: 'http://localhost:4200',
+  });
 }
