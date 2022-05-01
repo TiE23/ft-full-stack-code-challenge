@@ -3,28 +3,35 @@ import {
   CreateCategoryDto,
   CreateTaskDto,
   TaskEntity,
+  UpdateCategoryDto,
+  UpdateTaskDto,
 } from '../types/entity.types';
 
 export function createOptimisticCategory(
-  newCategory: CreateCategoryDto
+  categoryDto?: CreateCategoryDto | UpdateCategoryDto,
+  newTasks?: TaskEntity[]
 ): CategoryEntity {
   return {
-    ...newCategory,
-    tasks: [],
+    title: 'Optimistic Category',
+    tasks: newTasks || [],
     lexical_order: '',
     id: 0,
     created_at: '',
     updated_at: '',
+    ...categoryDto,
   };
 }
 
-export function createOptimisticTask(newTask: CreateTaskDto): TaskEntity {
+export function createOptimisticTask(
+  taskDto: CreateTaskDto | UpdateTaskDto
+): TaskEntity {
   return {
-    ...newTask,
+    title: 'Optimistic Task',
     category: createOptimisticCategory({ title: '' }),
     lexical_order: '',
     id: 0,
     created_at: '',
     updated_at: '',
+    ...taskDto,
   };
 }

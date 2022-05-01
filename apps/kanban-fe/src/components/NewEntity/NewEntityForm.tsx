@@ -1,33 +1,105 @@
 import React, { useState } from 'react';
 import { useMutation, useQueryClient } from 'react-query';
-import { createCategory } from '../../api/category.api';
+import {
+  addTask,
+  addTaskVariables,
+  createCategory,
+  createCategoryVariables,
+} from '../../api/category.api';
 
 import useFocus from '../../hooks/useFocus';
 import { EntityType } from '../../types/api.types';
-import { CategoryEntity, CreateCategoryDto } from '../../types/entity.types';
-import { createOptimisticCategory } from '../../utils/entity.utils';
+import {
+  CategoryEntity,
+  CreateCategoryDto,
+  EntityId,
+} from '../../types/entity.types';
+import {
+  createOptimisticCategory,
+  createOptimisticTask,
+} from '../../utils/entity.utils';
 import { NewEntityCreateButton, NewEntityInput } from './NewEntity.styles';
 
 export interface NewEntityFormProps {
   onSubmit: () => void;
   entityType: EntityType;
+  categoryId?: EntityId;
 }
 
-export function NewEntityForm({ onSubmit, entityType }: NewEntityFormProps) {
+export function NewEntityForm({
+  onSubmit,
+  entityType,
+  categoryId,
+}: NewEntityFormProps) {
   const [input, setInput] = useState('');
   const inputRef = useFocus();
 
   const queryClient = useQueryClient();
 
   const createCategoryMutation = useMutation(createCategory, {
-    onMutate: async (newCategory: CreateCategoryDto) => {
+    // Must define the return type explicitly due to a TS <4.7 limitation.
+    onMutate: async ({ createCategoryDto }: createCategoryVariables) => {
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update).
       await queryClient.cancelQueries('categories');
 
-      // Must define the return type explicitly due to a TS <4.7 limitation.
+      // Snapshot the previous value.
+      const previousCategories =
+        // Must also define explictly here.
+        queryClient.getQueryData<CategoryEntity[]>('categories');
+
+      const optimisticNewCategory = createOptimisticCategory(createCategoryDto);
+
+      // Optimistically update to the new value.
+      queryClient.setQueryData<CategoryEntity[]>('categories', (old) => {
+        if (old == null) {
+          return [optimisticNewCategory];
+        } else {
+          return [...old, optimisticNewCategory];
+        }
+      });
+
+      // Return a context with the previous and new Category.
+      return { previousCategories };
+    },
+    // If the mutation fails, use the context we returned above.
+    onError: (err, _newCategory, context) => {
+      if (context?.previousCategories) {
+        queryClient.setQueryData<CategoryEntity[]>(
+          'categories',
+          context.previousCategories
+        );
+      }
+      // TODO HANDLE ERROR
+      if (err) {
+        console.error(err);
+      }
+    },
+    // Always refetch after error or success.
+    onSettled: () => {
+      queryClient.invalidateQueries('categories');
+    },
+  });
+
+  const createTaskMutation = useMutation(addTask, {
+    onMutate: async ({ categoryId, createTaskDto }: addTaskVariables) => {
+      await queryClient.cancelQueries('categories');
+
       const previousCategories =
         queryClient.getQueryData<CategoryEntity[]>('categories');
 
-      const optimisticNewCategory = createOptimisticCategory(newCategory);
+      const previousCategory = previousCategories?.find(
+        (category) => category.id === categoryId
+      );
+
+      // Insert an optimistic new Task into the optimistic Category.
+      const optimisticNewTask = createOptimisticTask(createTaskDto);
+      const optimisticNewTasks = previousCategory
+        ? [...previousCategory.tasks, optimisticNewTask]
+        : [];
+      const optimisticNewCategory = createOptimisticCategory(
+        undefined,
+        optimisticNewTasks
+      );
 
       queryClient.setQueryData<CategoryEntity[]>('categories', (old) => {
         if (old == null) {
@@ -39,13 +111,14 @@ export function NewEntityForm({ onSubmit, entityType }: NewEntityFormProps) {
 
       return { previousCategories };
     },
-    onError: (err, newCategory, context) => {
+    onError: (err, _newCategory, context) => {
       if (context?.previousCategories) {
         queryClient.setQueryData<CategoryEntity[]>(
           'categories',
           context.previousCategories
         );
       }
+      // TODO HANDLE ERROR
       if (err) {
         console.error(err);
       }
@@ -67,9 +140,14 @@ export function NewEntityForm({ onSubmit, entityType }: NewEntityFormProps) {
 
   const submit = () => {
     if (entityType === EntityType.CATEGORY) {
-      createCategoryMutation.mutate({ title: input.trim() });
+      createCategoryMutation.mutate({
+        createCategoryDto: { title: input.trim() },
+      });
     } else {
-      console.log(`Create new ${entityType} with title ${input}`);
+      createTaskMutation.mutate({
+        categoryId: categoryId || -1,
+        createTaskDto: { title: input.trim() },
+      });
     }
     onSubmit();
   };
@@ -86,7 +164,7 @@ export function NewEntityForm({ onSubmit, entityType }: NewEntityFormProps) {
         onClick={() => submit()}
         disabled={input.trim().length === 0}
       >
-        Create
+        Create {entityType}
       </NewEntityCreateButton>
     </>
   );

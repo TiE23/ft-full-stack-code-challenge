@@ -1,14 +1,24 @@
 import useHideOnClickOutside from '../../hooks/useHideOnClickOutside';
 import { EntityType } from '../../types/api.types';
+import { EntityId } from '../../types/entity.types';
 
 import { AddEntityButton, NewEntityFormContainer } from './NewEntity.styles';
 import NewEntityForm from './NewEntityForm';
 
-interface NewEntityProps {
-  entityType: EntityType;
-}
+/**
+ * I love TypeScript.
+ */
+type NewEntityProps =
+  | {
+      entityType: EntityType.CATEGORY;
+    }
+  | {
+      entityType: EntityType.TASK;
+      categoryId: EntityId;
+    };
 
-export function NewEntity({ entityType }: NewEntityProps) {
+export function NewEntity(props: NewEntityProps) {
+  const { entityType } = props;
   const [showForm, setShowForm, ref] =
     useHideOnClickOutside<HTMLDivElement>(false);
 
@@ -20,6 +30,9 @@ export function NewEntity({ entityType }: NewEntityProps) {
             setShowForm(false);
           }}
           entityType={entityType}
+          categoryId={
+            entityType === EntityType.TASK ? props.categoryId : undefined
+          }
         />
       ) : (
         <AddEntityButton onClick={() => setShowForm(true)}>

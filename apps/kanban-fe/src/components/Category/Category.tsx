@@ -15,7 +15,7 @@ export function Category({ category }: CategoryProps) {
         {category.tasks.map((task) => (
           <Task key={task.id} task={task} />
         ))}
-        <NewEntity entityType={EntityType.TASK} />
+        <NewEntity entityType={EntityType.TASK} categoryId={category.id} />
       </TasksList>
     </CategoryContainer>
   );
