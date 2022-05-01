@@ -4,7 +4,7 @@ export const CategoryContainer = styled.div`
   width: ${(p) => p.theme.design.category.widthPx}px;
 
   flex-grow: 0;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 1rem 1rem;
 
   background-color: #ebecf0;
   border-radius: ${(p) => p.theme.design.category.radiusPx}px;

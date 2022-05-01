@@ -1,13 +1,14 @@
 import useHideOnClickOutside from '../../hooks/useHideOnClickOutside';
+import { EntityType } from '../../types/api.types';
 
 import { AddEntityButton, NewEntityFormContainer } from './NewEntity.styles';
 import NewEntityForm from './NewEntityForm';
 
 interface NewEntityProps {
-  buttonText: string;
+  entityType: EntityType;
 }
 
-export function NewEntity({ buttonText }: NewEntityProps) {
+export function NewEntity({ entityType }: NewEntityProps) {
   const [showForm, setShowForm, ref] =
     useHideOnClickOutside<HTMLDivElement>(false);
 
@@ -15,14 +16,14 @@ export function NewEntity({ buttonText }: NewEntityProps) {
     <NewEntityFormContainer ref={ref}>
       {showForm ? (
         <NewEntityForm
-          onCreate={(input) => {
-            console.log('Submitted:', input);
+          onSubmit={() => {
             setShowForm(false);
           }}
+          entityType={entityType}
         />
       ) : (
         <AddEntityButton onClick={() => setShowForm(true)}>
-          {buttonText}
+          + Create a new {entityType}
         </AddEntityButton>
       )}
     </NewEntityFormContainer>

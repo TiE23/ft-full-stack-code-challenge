@@ -1,6 +1,7 @@
 import { useQuery } from 'react-query';
 
 import { getAllCategories } from '../../api/category.api';
+import { EntityType } from '../../types/api.types';
 import { CategoryEntity } from '../../types/entity.types';
 import { Category } from '../Category';
 import { NewEntity } from '../NewEntity';
@@ -28,7 +29,7 @@ export function Board() {
       {data!.map((category) => (
         <Category key={category.id} category={category} />
       ))}
-      <NewEntity buttonText="+ Create a Category" />
+      <NewEntity entityType={EntityType.CATEGORY} />
     </BoardBase>
   );
 }

@@ -1,3 +1,4 @@
+import { EntityType } from '../../types/api.types';
 import { CategoryEntity } from '../../types/entity.types';
 import { NewEntity } from '../NewEntity';
 import { Task } from '../Task';
@@ -14,7 +15,7 @@ export function Category({ category }: CategoryProps) {
         {category.tasks.map((task) => (
           <Task key={task.id} task={task} />
         ))}
-        <NewEntity buttonText="+ Create a Task" />
+        <NewEntity entityType={EntityType.TASK} />
       </TasksList>
     </CategoryContainer>
   );
