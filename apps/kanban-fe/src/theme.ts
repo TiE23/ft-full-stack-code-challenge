@@ -5,6 +5,23 @@ export const theme = {
     regular: {
       'font-family': 'Ubuntu, sans-serif',
       'font-weight': '400',
+      'font-size': '16px',
+    },
+  },
+  design: {
+    board: {
+      paddingPx: 15,
+      radiusPx: 15,
+    },
+    category: {
+      widthPx: 300, // Used by multiple components.
+      radiusPx: 6,
+    },
+    task: {
+      radiusPx: 3,
+    },
+    newEntity: {
+      radiusPx: 3,
     },
   },
 };
@@ -27,7 +44,7 @@ export const GlobalStyle = createGlobalStyle<MainThemeProps>`
   input,
   textarea,
   button {
-    font-family: ${(p) => p.theme.fonts.regular};
+    ${(p) => p.theme.fonts.regular};
   }
 
   code {

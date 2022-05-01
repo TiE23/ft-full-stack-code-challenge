@@ -3,6 +3,7 @@ import { useQuery } from 'react-query';
 import { getAllCategories } from '../../api/category.api';
 import { CategoryEntity } from '../../types/entity.types';
 import { Category } from '../Category';
+import { NewEntity } from '../NewEntity';
 
 import { BoardBase } from './Board.styles';
 
@@ -11,8 +12,7 @@ export function Board() {
     'categories',
     getAllCategories
   );
-  console.log(status, error);
-  console.table(data);
+
   if (status === 'loading') {
     return <span>Loading...</span>;
   }
@@ -28,6 +28,7 @@ export function Board() {
       {data!.map((category) => (
         <Category key={category.id} category={category} />
       ))}
+      <NewEntity buttonText="+ Create a Category" />
     </BoardBase>
   );
 }

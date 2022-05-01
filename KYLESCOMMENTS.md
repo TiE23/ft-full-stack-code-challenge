@@ -49,3 +49,14 @@ These aren't important to read, they were mostly for myself. This was a learning
 1. Running into an issue where the auto increment of ids doesn't reset when I clear the Category table in the database. So when I write a test that looks for a Category by their ID it won't find it. Seeing if I might be able to manually run a query to [nuke the sqlite_sequence](https://www.designcise.com/web/tutorial/how-to-reset-autoincrement-number-sequence-in-sqlite) table...
 2. Yep, that worked. Now, when I clear the table, I also run a custom query to reset the autoincrement count back to 0. God, that felt good. I left my findings for others [here](https://github.com/typeorm/typeorm/issues/4533#issuecomment-1114010392).
 3. Oh, also, it turns out that Jest's `beforeEach()` and `afterEach()` functions don't pay attention to `describe()` blocks. So even if attempt to nest sets of `it()`'s under `describe()` blocks and strategically place `beforeEach()` and `afterEach()` above the `describe()` blocks it will still run before and after each `it()`, not the `describe()`. Just running some console.log() statements lead me to look into this and [found confirmation](https://joshua-toth.medium.com/jests-beforeeach-may-not-be-running-the-way-you-think-it-does-c81599d83649).
+4. Spent good amount of time working on e2e tests and got it to where I want.
+5. Initial front end work. Just tossing to things up and using react-query for the first time just to get Categories from the server. Had to further configured CORS rules in the backend to get it to work correctly.
+
+### Sunday Notes
+
+1. Blitz time for the front end! I've already learned a lot for this challenge on the back end so I'm just going to skip ChakraUI and just go with home-grown styled-components and a theme.
+2. Defining API functions using Axios immediately. Just taking care of the basic things I can just do right away.
+3. Hey, using NX to generate new components is pretty fun.
+4. Practicing "composable" styling where I do not define positioning or padding for a component and instead only let components position and space child components. This is something I learned from the creator of [Bedrock-Layouts](https://github.com/Bedrock-Layouts/Bedrock)
+5. Custom hook to focus on input element on appearance.
+6. Another custom hook to hide a component when there is a click outside the component.

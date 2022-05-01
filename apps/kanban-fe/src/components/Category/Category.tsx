@@ -1,4 +1,5 @@
 import { CategoryEntity } from '../../types/entity.types';
+import { NewEntity } from '../NewEntity';
 import { Task } from '../Task';
 import { CategoryContainer, CategoryTitle, TasksList } from './Category.styles';
 
@@ -6,7 +7,6 @@ interface CategoryProps {
   category: CategoryEntity;
 }
 export function Category({ category }: CategoryProps) {
-  console.table(category);
   return (
     <CategoryContainer>
       <CategoryTitle>{category.title}</CategoryTitle>
@@ -14,6 +14,7 @@ export function Category({ category }: CategoryProps) {
         {category.tasks.map((task) => (
           <Task key={task.id} task={task} />
         ))}
+        <NewEntity buttonText="+ Create a Task" />
       </TasksList>
     </CategoryContainer>
   );
