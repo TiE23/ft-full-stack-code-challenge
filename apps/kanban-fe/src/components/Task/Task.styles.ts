@@ -28,6 +28,10 @@ export const TaskTitle = styled.div`
   padding: 0.5rem 1rem;
 `;
 
+export const TaskControlsContainer = styled.div`
+  position: relative;
+`;
+
 interface TaskExpandedAreaProps {
   expanded: boolean;
   expandedHeightPx: Px;

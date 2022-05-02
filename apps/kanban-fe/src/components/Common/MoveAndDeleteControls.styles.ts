@@ -1,21 +1,41 @@
 import styled, { css } from 'styled-components/macro';
-import { Percent } from '../../types/styling.types';
+import { animated } from '@react-spring/web';
 
-interface ControlsSecetionProps {
+import { Percent, Px } from '../../types/styling.types';
+
+interface FadeDivProps {
   show: boolean;
-  opacityMin: Percent;
+  opacityMin?: Percent;
 }
-export const ControlsSection = styled.div<ControlsSecetionProps>`
+const FadeDiv = styled.div<FadeDivProps>`
+  opacity: ${({ show, opacityMin = 0 }) => (show ? 100 : opacityMin)}%;
+  transition: opacity ${(p) => p.theme.design.controls.transitionTimeMs}ms
+    ${(p) => p.theme.design.controls.transitionDelayMs}ms;
+`;
+
+interface ControlsContainerProps {
+  heightPx: Px;
+  widthPx: Px;
+}
+
+export const ControlsContainer = styled(FadeDiv)<ControlsContainerProps>`
+  position: relative;
+  height: ${({ heightPx }) => heightPx}px;
+  width: ${({ widthPx }) => widthPx}px;
+`;
+
+const EditSection = styled.div`
+  right: 0.5rem;
+`;
+export const AnimatedEditSection = animated(EditSection);
+
+const ControlsSection = styled.div`
+  right: 0.5rem;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  padding: 0 0.5rem;
-  gap: 0.4rem;
-
-  opacity: ${({ show, opacityMin }) => (show ? 100 : opacityMin)}%;
-
-  transition: opacity 100ms;
 `;
+export const AnimatedControlsSection = animated(ControlsSection);
 
 export const NoStyleButton = styled.button`
   ${({ disabled }) =>

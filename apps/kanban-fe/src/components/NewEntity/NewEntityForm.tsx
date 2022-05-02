@@ -42,7 +42,7 @@ export function NewEntityForm({
       categoryMutations.createCategoryMutation.mutate({
         createCategoryDto: { title: input.trim() },
       });
-    } else {
+    } else if (entityType === EntityType.TASK) {
       taskMutations.createTaskMutation.mutate({
         categoryId: categoryId || -1,
         createTaskDto: { title: input.trim() },

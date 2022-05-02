@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useQueryClient } from 'react-query';
 import useMeasure from 'react-use-measure';
 
@@ -10,6 +11,7 @@ import { parseAndPrintDate } from '../../utils/display.utils';
 import { MoveAndDeleteControls } from '../Common';
 import {
   TaskContainer,
+  TaskControlsContainer,
   TaskDate,
   TaskDatesGrid,
   TaskExpandedArea,
@@ -41,38 +43,45 @@ export function Task({
   const taskMutations = new TaskMutations(queryClient);
 
   return (
-    <TaskContainer>
+    <TaskContainer
+      ref={clickOutsideRef}
+      onClick={() => {
+        if (!expanded) setExpanded(true); // Only outside click closes.
+      }}
+    >
       <TaskTitleRow ref={hoverRef}>
-        <TaskTitle ref={clickOutsideRef} onClick={() => setExpanded(!expanded)}>
-          {task.title}
-        </TaskTitle>
-        <MoveAndDeleteControls
-          disableMoveLeft={leftCategoryId == null}
-          disableMoveRight={rightCategoryId == null}
-          moveLeft={() =>
-            taskMutations.moveTaskMutation.mutate({
-              taskId: task.id,
-              fromCategoryId: categoryId,
-              toCategoryId: leftCategoryId!, // Coax TS a little here...
-              newPosition: -1, // To the end.
-            })
-          }
-          moveRight={() =>
-            taskMutations.moveTaskMutation.mutate({
-              taskId: task.id,
-              fromCategoryId: categoryId,
-              toCategoryId: rightCategoryId!, // Coax TS a little here...
-              newPosition: -1, // To the end.
-            })
-          }
-          trash={() =>
-            taskMutations.deleteTaskMutation.mutate({
-              taskId: task.id,
-              categoryId,
-            })
-          }
-          show={hovering}
-        />
+        <TaskTitle>{task.title}</TaskTitle>
+        <TaskControlsContainer>
+          <MoveAndDeleteControls
+            disableMoveLeft={leftCategoryId == null}
+            disableMoveRight={rightCategoryId == null}
+            moveLeft={() =>
+              taskMutations.moveTaskMutation.mutate({
+                taskId: task.id,
+                fromCategoryId: categoryId,
+                toCategoryId: leftCategoryId!, // Coax TS a little here...
+                newPosition: -1, // To the end.
+              })
+            }
+            moveRight={() =>
+              taskMutations.moveTaskMutation.mutate({
+                taskId: task.id,
+                fromCategoryId: categoryId,
+                toCategoryId: rightCategoryId!, // Coax TS a little here...
+                newPosition: -1, // To the end.
+              })
+            }
+            trash={() =>
+              taskMutations.deleteTaskMutation.mutate({
+                taskId: task.id,
+                categoryId,
+              })
+            }
+            openEdit={() => console.log('openEdit')}
+            show={hovering}
+            mode={expanded ? 'edit' : 'move'}
+          />
+        </TaskControlsContainer>
       </TaskTitleRow>
       <TaskExpandedArea expanded={expanded} expandedHeightPx={bottomHeight}>
         <TaskExpandedContent ref={bottomRef}>

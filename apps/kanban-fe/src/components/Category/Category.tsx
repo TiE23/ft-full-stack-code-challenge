@@ -10,6 +10,7 @@ import { NewEntity } from '../NewEntity';
 import { Task } from '../Task';
 import {
   CategoryContainer,
+  CategoryControlsContainer,
   CategoryTitle,
   CategoryTitleRow,
   TasksList,
@@ -37,28 +38,31 @@ export function Category({
     <CategoryContainer>
       <CategoryTitleRow ref={hoverRef}>
         <CategoryTitle>{category.title}</CategoryTitle>
-        <MoveAndDeleteControls
-          disableMoveLeft={leftCategoryId == null}
-          disableMoveRight={rightCategoryId == null}
-          moveLeft={() =>
-            categoryMutations.repositionCategoryMutation.mutate({
-              categoryId: category.id,
-              newPosition: categoryIndex - 1,
-            })
-          }
-          moveRight={() =>
-            categoryMutations.repositionCategoryMutation.mutate({
-              categoryId: category.id,
-              newPosition: categoryIndex + 1,
-            })
-          }
-          trash={() =>
-            categoryMutations.deleteCategoryMutation.mutate({
-              categoryId: category.id,
-            })
-          }
-          show={hovering}
-        />
+        <CategoryControlsContainer>
+          <MoveAndDeleteControls
+            disableMoveLeft={leftCategoryId == null}
+            disableMoveRight={rightCategoryId == null}
+            moveLeft={() =>
+              categoryMutations.repositionCategoryMutation.mutate({
+                categoryId: category.id,
+                newPosition: categoryIndex - 1,
+              })
+            }
+            moveRight={() =>
+              categoryMutations.repositionCategoryMutation.mutate({
+                categoryId: category.id,
+                newPosition: categoryIndex + 1,
+              })
+            }
+            trash={() =>
+              categoryMutations.deleteCategoryMutation.mutate({
+                categoryId: category.id,
+              })
+            }
+            show={hovering}
+            mode={'move'}
+          />
+        </CategoryControlsContainer>
       </CategoryTitleRow>
       <TasksList>
         {category.tasks.map((task) => (

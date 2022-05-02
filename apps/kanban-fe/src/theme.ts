@@ -32,6 +32,11 @@ export const theme = {
     newEntity: {
       radiusPx: 3,
     },
+    controls: {
+      transitionDelayMs: 0,
+      transitionTimeMs: 250,
+      iconSizePx: 16,
+    },
   },
 };
 

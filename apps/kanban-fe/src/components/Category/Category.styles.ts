@@ -25,6 +25,10 @@ export const CategoryTitle = styled.div`
   padding: 0.5rem 0 1rem;
 `;
 
+export const CategoryControlsContainer = styled.div`
+  padding-bottom: 0.5rem; /* I don't like this. */
+`;
+
 export const TasksList = styled.div`
   display: flex;
   flex-direction: column;

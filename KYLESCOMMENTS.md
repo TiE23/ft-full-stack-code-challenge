@@ -84,3 +84,5 @@ These aren't important to read, they were mostly for myself. This was a learning
 14. Had to dive back into the backend to solve an issue where moving a Task between Categories wouldn't update the updated_at column automatically. Found [a solution utilizing Subscribers](https://github.com/typeorm/typeorm/issues/5378#issuecomment-632435566) that was flawed (it caused my e2e tests to fail - woo, thank you e2e tests!) but made the adjustment that was needed and left a comment for future poor souls who run into this issue themselves.
 15. Discovered and fixed a nasty bug involving accidentally ignoring a 0 with `||` when I should've used `??` to detect an undefined property.
 16. Using `react-use-measure` to do some nice fitting to the Task expand transition.
+17. Worked hard on making an elegant solution to incorporate an edit button that shares the same space as the move/delete controls.
+18. It's a lot of fun busting out `@react-spring/web` for the first time in a two months.
