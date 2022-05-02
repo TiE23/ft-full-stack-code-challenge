@@ -18,7 +18,7 @@ export function findObjectAndIndex<T>(
   predicate: FindPredicate<T>,
   list?: T[]
 ): [number, T?] {
-  const indexOfItem = list?.findIndex(predicate) || -1;
+  const indexOfItem = list?.findIndex(predicate) ?? -1;
   return [indexOfItem, list?.[indexOfItem]];
 }
 
@@ -33,6 +33,6 @@ export function findObjectAndIndexCloneDeep<T>(
   predicate: FindPredicate<T>,
   list?: T[]
 ): [number, T?] {
-  const indexOfItem = list?.findIndex(predicate) || -1;
+  const indexOfItem = list?.findIndex(predicate) ?? -1;
   return [indexOfItem, cloneDeep(list?.[indexOfItem])];
 }
