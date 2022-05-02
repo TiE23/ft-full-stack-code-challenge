@@ -1,11 +1,20 @@
 import styled, { css } from 'styled-components/macro';
+import { Percent } from '../../types/styling.types';
 
-export const ControlsSection = styled.div`
+interface ControlsSecetionProps {
+  show: boolean;
+  opacityMin: Percent;
+}
+export const ControlsSection = styled.div<ControlsSecetionProps>`
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
   padding: 0 0.5rem;
   gap: 0.4rem;
+
+  opacity: ${({ show, opacityMin }) => (show ? 100 : opacityMin)}%;
+
+  transition: opacity 100ms;
 `;
 
 export const NoStyleButton = styled.button`

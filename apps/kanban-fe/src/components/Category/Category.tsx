@@ -1,4 +1,5 @@
 import { useQueryClient } from 'react-query';
+import useHover from '../../hooks/useHover';
 
 import CategoryMutations from '../../mutations/category.mutations';
 import { EntityType } from '../../types/api.types';
@@ -26,13 +27,15 @@ export function Category({
   leftCategoryId,
   rightCategoryId,
 }: CategoryProps) {
+  const [hoverRef, hovering] = useHover<HTMLDivElement>('enter');
+
   const queryClient = useQueryClient();
 
   const categoryMutations = new CategoryMutations(queryClient);
 
   return (
     <CategoryContainer>
-      <CategoryTitleRow>
+      <CategoryTitleRow ref={hoverRef}>
         <CategoryTitle>{category.title}</CategoryTitle>
         <MoveAndDeleteControls
           disableMoveLeft={leftCategoryId == null}
@@ -54,6 +57,7 @@ export function Category({
               categoryId: category.id,
             })
           }
+          show={hovering}
         />
       </CategoryTitleRow>
       <TasksList>

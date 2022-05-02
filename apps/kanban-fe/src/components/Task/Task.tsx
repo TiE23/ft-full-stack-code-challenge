@@ -2,6 +2,7 @@ import { useQueryClient } from 'react-query';
 import useMeasure from 'react-use-measure';
 
 import useHideOnClickOutside from '../../hooks/useHideOnClickOutside';
+import useHover from '../../hooks/useHover';
 import TaskMutations from '../../mutations/task.mutations';
 import { EntityId, TaskEntity } from '../../types/entity.types';
 import { parseAndPrintDate } from '../../utils/display.utils';
@@ -30,7 +31,8 @@ export function Task({
   leftCategoryId,
   rightCategoryId,
 }: TaskProps) {
-  const [expanded, setExpanded, ref] =
+  const [hoverRef, hovering] = useHover<HTMLDivElement>('over');
+  const [expanded, setExpanded, clickOutsideRef] =
     useHideOnClickOutside<HTMLDivElement>(false);
   const [bottomRef, { height: bottomHeight }] = useMeasure();
 
@@ -40,8 +42,8 @@ export function Task({
 
   return (
     <TaskContainer>
-      <TaskTitleRow>
-        <TaskTitle ref={ref} onClick={() => setExpanded(!expanded)}>
+      <TaskTitleRow ref={hoverRef}>
+        <TaskTitle ref={clickOutsideRef} onClick={() => setExpanded(!expanded)}>
           {task.title}
         </TaskTitle>
         <MoveAndDeleteControls
@@ -69,6 +71,7 @@ export function Task({
               categoryId,
             })
           }
+          show={hovering}
         />
       </TaskTitleRow>
       <TaskExpandedArea expanded={expanded} expandedHeightPx={bottomHeight}>

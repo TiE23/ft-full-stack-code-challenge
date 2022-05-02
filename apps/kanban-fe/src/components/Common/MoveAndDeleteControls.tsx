@@ -3,6 +3,7 @@ import {
   ChevronRightIcon,
   DeleteIcon,
 } from '@chakra-ui/icons';
+import { Percent } from '../../types/styling.types';
 
 import { ControlsSection, NoStyleButton } from './MoveAndDeleteControls.styles';
 
@@ -12,6 +13,8 @@ interface MoveAndDeleteControlsProps {
   moveLeft: VoidFunction;
   moveRight: VoidFunction;
   trash: VoidFunction; // Named 'trash' because `delete` is a reserved keyword.
+  show?: boolean;
+  opacityMin?: Percent;
 }
 
 export function MoveAndDeleteControls({
@@ -20,9 +23,11 @@ export function MoveAndDeleteControls({
   moveLeft,
   moveRight,
   trash,
+  show = true,
+  opacityMin = 0,
 }: MoveAndDeleteControlsProps) {
   return (
-    <ControlsSection>
+    <ControlsSection show={show} opacityMin={opacityMin}>
       <NoStyleButton disabled={disableMoveLeft} onClick={moveLeft}>
         <ChevronLeftIcon />
       </NoStyleButton>
