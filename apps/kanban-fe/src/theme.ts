@@ -27,15 +27,27 @@ export const theme = {
       expandedBgColor: '#f7f7f7',
       fadedTextColor: '#404040',
       radiusPx: 3,
-      boxShadow: '#091e4240 0px 1px 0px 0px',
     },
     newEntity: {
       radiusPx: 3,
+      bgColor: '#ffffff3d',
+      bgColorHover: '#ffffff52',
     },
     controls: {
       transitionDelayMs: 0,
       transitionTimeMs: 250,
       iconSizePx: 16,
+    },
+    common: {
+      bottomBoxShadow: '#091e4240 0px 1px 0px 0px',
+      input: {
+        button: {
+          disabledColor: '#8b8b8b',
+          submit: {
+            activeColor: '#5aac44',
+          },
+        },
+      },
     },
   },
 };

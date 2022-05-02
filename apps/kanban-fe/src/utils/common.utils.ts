@@ -36,3 +36,21 @@ export function findObjectAndIndexCloneDeep<T>(
   const indexOfItem = list?.findIndex(predicate) ?? -1;
   return [indexOfItem, cloneDeep(list?.[indexOfItem])];
 }
+
+/**
+ * Listen for the enter key so we can trigger a submit in a controlled manner.
+ * This is a currying function so take your input element and provide the
+ * callback that triggers your submission into the `onKeyPress` props. Like so:
+ *  <input
+ *    onKeyPress={listenForEnter(submit)} // <-- This function!
+ *    value={input}
+ *    onChange={(e) => setInput(e.target.value)}
+ *  />
+ * @param cb
+ */
+export const listenForEnter =
+  (cb: VoidFunction) => (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      cb();
+    }
+  };

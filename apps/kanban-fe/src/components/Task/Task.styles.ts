@@ -10,7 +10,7 @@ export const TaskContainer = styled.div`
 
   background-color: ${(p) => p.theme.design.task.bgColor};
   border-radius: ${(p) => p.theme.design.task.radiusPx}px;
-  box-shadow: ${(p) => p.theme.design.task.boxShadow};
+  box-shadow: ${(p) => p.theme.design.common.bottomBoxShadow};
   cursor: pointer;
   overflow: hidden;
 `;

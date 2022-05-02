@@ -8,8 +8,10 @@ import {
   deleteTaskVariables,
   moveAndRepositionTask,
   moveAndRepositionTaskVariables,
+  updateTask,
+  updateTaskVariables,
 } from '../api/task.api';
-import { CategoryEntity } from '../types/entity.types';
+import { CategoryEntity, TaskEntity } from '../types/entity.types';
 import { findObjectAndIndexCloneDeep } from '../utils/common.utils';
 import { createOptimisticTask } from '../utils/entity.utils';
 
@@ -90,6 +92,73 @@ export default class TaskMutations {
     },
   });
 
+  updateTaskMutation = useMutation(updateTask, {
+    onMutate: async ({
+      taskId,
+      categoryId,
+      updateTaskDto,
+    }: updateTaskVariables) => {
+      await this.queryClient.cancelQueries('categories');
+
+      const previousCategories =
+        this.queryClient.getQueryData<CategoryEntity[]>('categories');
+
+      this.queryClient.setQueryData<CategoryEntity[]>(
+        'categories',
+        (oldCategories) => {
+          if (oldCategories != null) {
+            const [targetCategoryIndex, targetCategoryClone] =
+              findObjectAndIndexCloneDeep(
+                ({ id }) => id === categoryId,
+                oldCategories
+              );
+            const [targetTaskIndex, targetTaskClone] =
+              findObjectAndIndexCloneDeep(
+                ({ id }) => id === taskId,
+                targetCategoryClone?.tasks
+              );
+
+            if (targetCategoryClone != null && targetTaskClone != null) {
+              // Create the optimistic updated Task entity.
+              const optimisticTask: TaskEntity = {
+                ...targetTaskClone,
+                ...updateTaskDto,
+              };
+              // Insert it into the target Category.
+              targetCategoryClone.tasks[targetTaskIndex] = optimisticTask;
+
+              // Update the target Category with the new data and return it.
+              const oldCategoriesClone = cloneDeep(oldCategories);
+              oldCategoriesClone[targetCategoryIndex] = targetCategoryClone;
+              return oldCategoriesClone;
+            }
+            return oldCategories;
+          }
+          return [];
+        }
+      );
+
+      return { previousCategories };
+    },
+    onError: (err, _, context) => {
+      if (context?.previousCategories) {
+        this.queryClient.setQueryData<CategoryEntity[]>(
+          'categories',
+          context.previousCategories
+        );
+      }
+      toast.error(
+        `An error occurred while updating Task${err ? `\n${String(err)}` : ''}`
+      );
+    },
+    onSettled: () => {
+      this.queryClient.invalidateQueries('categories');
+    },
+    onSuccess: (task) => {
+      toast.success(`Task "${task.title}" updated!`);
+    },
+  });
+
   /**
    * Mutation to move a Task from one Category to another with optimistic
    * updates... which are a bit silly.
@@ -129,7 +198,11 @@ export default class TaskMutations {
               );
 
             // Move the Task. Remove out of 'from'. Splice/push it into 'to'.
-            if (targetTaskClone != null) {
+            if (
+              targetTaskClone != null &&
+              toCategoryClone != null &&
+              fromCategoryClone != null
+            ) {
               fromCategoryClone?.tasks.splice(targetTaskIndex, 1);
               if (newPosition < 0) {
                 // Add it to the end if newPosition is -1.
@@ -138,9 +211,7 @@ export default class TaskMutations {
                 // No need to check if newPosition >= length, splice handles it.
                 toCategoryClone?.tasks.splice(newPosition, 0, targetTaskClone);
               }
-            }
 
-            if (toCategoryClone != null && fromCategoryClone != null) {
               const oldCategoriesClone = cloneDeep(oldCategories);
               oldCategoriesClone[fromCategoryIndex] = fromCategoryClone;
               oldCategoriesClone[toCategoryIndex] = toCategoryClone;

@@ -6,8 +6,10 @@ import CategoryMutations from '../../mutations/category.mutations';
 import TaskMutations from '../../mutations/task.mutations';
 import { EntityType } from '../../types/api.types';
 import { EntityId } from '../../types/entity.types';
+import { listenForEnter } from '../../utils/common.utils';
 
-import { NewEntityCreateButton, NewEntityInput } from './NewEntity.styles';
+import SubmitButton from '../Common/Inputs/SubmitButton.styled';
+import StringInput from '../Common/Inputs/StringInput.styled';
 
 export interface NewEntityFormProps {
   onSubmit: VoidFunction;
@@ -27,17 +29,10 @@ export function NewEntityForm({
   const taskMutations = new TaskMutations(queryClient);
   const categoryMutations = new CategoryMutations(queryClient);
 
-  /**
-   * Listen for the enter key so we can trigger a submit in a controlled manner.
-   * @param event
-   */
-  const handleInput = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      submit();
+  const handleSubmit = () => {
+    if (input.trim() === '') {
+      return;
     }
-  };
-
-  const submit = () => {
     if (entityType === EntityType.CATEGORY) {
       categoryMutations.createCategoryMutation.mutate({
         createCategoryDto: { title: input.trim() },
@@ -53,18 +48,18 @@ export function NewEntityForm({
 
   return (
     <>
-      <NewEntityInput
+      <StringInput
         ref={inputRef}
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        onKeyPress={handleInput}
+        onKeyPress={listenForEnter(handleSubmit)}
       />
-      <NewEntityCreateButton
-        onClick={() => submit()}
+      <SubmitButton
+        onClick={() => handleSubmit()}
         disabled={input.trim().length === 0}
       >
         Create {entityType}
-      </NewEntityCreateButton>
+      </SubmitButton>
     </>
   );
 }

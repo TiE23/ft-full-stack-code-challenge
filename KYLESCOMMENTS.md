@@ -85,4 +85,6 @@ These aren't important to read, they were mostly for myself. This was a learning
 15. Discovered and fixed a nasty bug involving accidentally ignoring a 0 with `||` when I should've used `??` to detect an undefined property.
 16. Using `react-use-measure` to do some nice fitting to the Task expand transition.
 17. Worked hard on making an elegant solution to incorporate an edit button that shares the same space as the move/delete controls.
-18. It's a lot of fun busting out `@react-spring/web` for the first time in a two months.
+18. It's a lot of fun busting out [`@react-spring/web`](https://react-spring.io/) for the first time in a two months. Use it to transition between edit and move controls so that they can finish transitioning to a fade-out fade out before being dismounted.
+19. Refactoring mutations to be more efficient.
+20. Hey, look at that, with `listenForEnter()` I came across a situation where **function currying** is perfect.

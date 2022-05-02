@@ -4,6 +4,7 @@ import { DeleteResult } from '../types/api.types';
 
 export interface updateTaskVariables {
   taskId: EntityId;
+  categoryId: EntityId; // Only used in Mutation.
   updateTaskDto: UpdateTaskDto;
 }
 export async function updateTask({

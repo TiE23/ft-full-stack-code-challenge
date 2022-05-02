@@ -9,6 +9,7 @@ const useFocus = () => {
   const ref = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    console.log('focus!!', !!ref.current?.focus());
     ref.current?.focus();
   }, []);
 
