@@ -36,6 +36,7 @@ export async function moveAndRepositionTask({
 
 export interface deleteTaskVariables {
   taskId: EntityId;
+  categoryId: EntityId; // Only used in Mutation.
 }
 export async function deleteTask({
   taskId,
