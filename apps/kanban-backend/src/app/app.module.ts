@@ -1,19 +1,18 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { makeDatabase } from './configureDatabase';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-import {TypeOrmModule} from "@nestjs/typeorm";
+import { TaskModule } from '../task/task.module';
+import { CategoryModule } from '../category/category.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      entities: ['src/**/*.entity.ts'],
-      autoLoadEntities: true,
-      synchronize: true,
-      database: 'kanban-db.sqlite3',
-      type: 'sqlite'
-    }),
+    TypeOrmModule.forRoot(makeDatabase('kanban-db.sqlite3')),
+    CategoryModule,
+    TaskModule,
   ],
   controllers: [AppController],
   providers: [AppService],
