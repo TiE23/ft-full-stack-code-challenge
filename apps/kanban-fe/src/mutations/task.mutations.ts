@@ -31,47 +31,45 @@ export default class TaskMutations {
   }
 
   /**
-   * Mutation to delete Tasks
-   * Tip: Read the comments in NewEntityForm for line-by-line details as it's
-   * quite similar.
+   * Mutation to create new Tasks (added to a Category) with optimistic updates.
+   * Tip: Read createCategoryMutation for basic comments explaining what's
+   * happening.
    */
-  deleteTaskMutation = useMutation(deleteTask, {
-    onMutate: async ({ taskId, categoryId }: deleteTaskVariables) => {
+  createTaskMutation = useMutation(addTask, {
+    // Performing optimistic updates.
+    onMutate: async ({ categoryId, createTaskDto }: addTaskVariables) => {
       await this.queryClient.cancelQueries('categories');
 
       const previousCategories =
         this.queryClient.getQueryData<CategoryEntity[]>('categories');
 
-      const [targetCategoryIndex, targetCategoryClone] =
-        findObjectAndIndexCloneDeep(
-          (category) => category.id === categoryId,
-          previousCategories
-        );
+      const previousCategory = previousCategories?.find(
+        (category) => category.id === categoryId
+      );
 
-      if (targetCategoryClone != null) {
-        const optimisticNewTasks = cloneDeep(
-          targetCategoryClone
-            ? targetCategoryClone?.tasks.filter((task) => task.id !== taskId)
-            : []
-        );
-        targetCategoryClone.tasks = optimisticNewTasks;
-      }
+      // Insert an optimistic new Task into the optimistic Category.
+      const optimisticNewTask = createOptimisticTask(createTaskDto);
+      const optimisticNewTasks = previousCategory
+        ? [...previousCategory.tasks, optimisticNewTask]
+        : [];
+      const optimisticNewCategory = createOptimisticCategory(
+        undefined,
+        optimisticNewTasks
+      );
 
       this.queryClient.setQueryData<CategoryEntity[]>(
         'categories',
         (oldCategories) => {
-          if (oldCategories != null && targetCategoryClone != null) {
-            const oldCategoriesClone = cloneDeep(oldCategories);
-            oldCategoriesClone[targetCategoryIndex] = targetCategoryClone;
-            return oldCategoriesClone;
+          if (oldCategories == null) {
+            return [optimisticNewCategory];
           }
-          return [];
+          return [...oldCategories, optimisticNewCategory];
         }
       );
 
       return { previousCategories };
     },
-    onError: (err, _, context) => {
+    onError: (err, _newCategory, context) => {
       if (context?.previousCategories) {
         this.queryClient.setQueryData<CategoryEntity[]>(
           'categories',
@@ -79,7 +77,7 @@ export default class TaskMutations {
         );
       }
       toast.error(
-        `An error occurred while deleting the Task${
+        `An error occurred while creating a new Task${
           err ? `\n${String(err)}` : ''
         }`
       );
@@ -87,15 +85,18 @@ export default class TaskMutations {
     onSettled: () => {
       this.queryClient.invalidateQueries('categories');
     },
-    onSuccess: () => {
-      toast.success('Task deleted!');
+    onSuccess: (category) => {
+      toast.success(
+        `Task "${category.tasks[category.tasks.length - 1].title}" created!`
+      );
     },
   });
 
   /**
    * Mutation to move a Task from one Category to another with optimistic
-   * updates.
-   * The optimistic updates make this quite silly, I must say.
+   * updates... which are a bit silly.
+   * Tip: Read createCategoryMutation for basic comments explaining what's
+   * happening.
    */
   moveTaskMutation = useMutation(moveAndRepositionTask, {
     onMutate: async ({
@@ -152,7 +153,6 @@ export default class TaskMutations {
       );
       return { previousCategories };
     },
-    // If the mutation fails, use the context we returned above.
     onError: (err, _, context) => {
       if (context?.previousCategories) {
         this.queryClient.setQueryData<CategoryEntity[]>(
@@ -164,7 +164,6 @@ export default class TaskMutations {
         `An error occurred while moving Task${err ? `\n${String(err)}` : ''}`
       );
     },
-    // Always refetch after error or success.
     onSettled: () => {
       this.queryClient.invalidateQueries('categories');
     },
@@ -174,43 +173,47 @@ export default class TaskMutations {
   });
 
   /**
-   * Mutation to create new Tasks (added to a Category) with optimistic updates.
+   * Mutation to delete Tasks with optimistic updates.
+   * Tip: Read createCategoryMutation for basic comments explaining what's
+   * happening.
    */
-  createTaskMutation = useMutation(addTask, {
-    // Performing optimistic updates.
-    onMutate: async ({ categoryId, createTaskDto }: addTaskVariables) => {
+  deleteTaskMutation = useMutation(deleteTask, {
+    onMutate: async ({ taskId, categoryId }: deleteTaskVariables) => {
       await this.queryClient.cancelQueries('categories');
 
       const previousCategories =
         this.queryClient.getQueryData<CategoryEntity[]>('categories');
 
-      const previousCategory = previousCategories?.find(
-        (category) => category.id === categoryId
-      );
+      const [targetCategoryIndex, targetCategoryClone] =
+        findObjectAndIndexCloneDeep(
+          (category) => category.id === categoryId,
+          previousCategories
+        );
 
-      // Insert an optimistic new Task into the optimistic Category.
-      const optimisticNewTask = createOptimisticTask(createTaskDto);
-      const optimisticNewTasks = previousCategory
-        ? [...previousCategory.tasks, optimisticNewTask]
-        : [];
-      const optimisticNewCategory = createOptimisticCategory(
-        undefined,
-        optimisticNewTasks
-      );
+      if (targetCategoryClone != null) {
+        const optimisticNewTasks = cloneDeep(
+          targetCategoryClone
+            ? targetCategoryClone?.tasks.filter((task) => task.id !== taskId)
+            : []
+        );
+        targetCategoryClone.tasks = optimisticNewTasks;
+      }
 
       this.queryClient.setQueryData<CategoryEntity[]>(
         'categories',
         (oldCategories) => {
-          if (oldCategories == null) {
-            return [optimisticNewCategory];
+          if (oldCategories != null && targetCategoryClone != null) {
+            const oldCategoriesClone = cloneDeep(oldCategories);
+            oldCategoriesClone[targetCategoryIndex] = targetCategoryClone;
+            return oldCategoriesClone;
           }
-          return [...oldCategories, optimisticNewCategory];
+          return [];
         }
       );
 
       return { previousCategories };
     },
-    onError: (err, _newCategory, context) => {
+    onError: (err, _, context) => {
       if (context?.previousCategories) {
         this.queryClient.setQueryData<CategoryEntity[]>(
           'categories',
@@ -218,7 +221,7 @@ export default class TaskMutations {
         );
       }
       toast.error(
-        `An error occurred while creating a new Task${
+        `An error occurred while deleting the Task${
           err ? `\n${String(err)}` : ''
         }`
       );
@@ -226,10 +229,8 @@ export default class TaskMutations {
     onSettled: () => {
       this.queryClient.invalidateQueries('categories');
     },
-    onSuccess: (category) => {
-      toast.success(
-        `Task "${category.tasks[category.tasks.length - 1].title}" created!`
-      );
+    onSuccess: () => {
+      toast.success('Task deleted!');
     },
   });
 }

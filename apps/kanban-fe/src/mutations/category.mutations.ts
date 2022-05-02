@@ -124,7 +124,6 @@ export default class CategoryMutations {
       );
       return { previousCategories };
     },
-    // If the mutation fails, use the context we returned above.
     onError: (err, _, context) => {
       if (context?.previousCategories) {
         this.queryClient.setQueryData<CategoryEntity[]>(
@@ -138,7 +137,6 @@ export default class CategoryMutations {
         }`
       );
     },
-    // Always refetch after error or success.
     onSettled: () => {
       this.queryClient.invalidateQueries('categories');
     },
@@ -147,6 +145,9 @@ export default class CategoryMutations {
     },
   });
 
+  /**
+   * Mutation to delete Categories.
+   */
   deleteCategoryMutation = useMutation(deleteCategory, {
     onMutate: async ({ categoryId }: deleteCategoryVariables) => {
       await this.queryClient.cancelQueries('categories');
