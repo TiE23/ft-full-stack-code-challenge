@@ -46,7 +46,6 @@ export default class TaskMutations {
         'categories',
         (oldCategories) => {
           if (oldCategories != null) {
-            const oldCategoriesClone = cloneDeep(oldCategories!);
             const [targetCategoryIndex, targetCategoryClone] =
               findObjectAndIndexCloneDeep(
                 ({ id }) => id === categoryId,
@@ -58,10 +57,10 @@ export default class TaskMutations {
 
               // Insert an optimistic new Task into the Category.
               targetCategoryClone.tasks.push(optimisticNewTask);
-              oldCategoriesClone[targetCategoryIndex] = targetCategoryClone;
+              oldCategories[targetCategoryIndex] = targetCategoryClone;
             }
 
-            return oldCategoriesClone;
+            return oldCategories;
           }
           return []; // Don't know what to do; return empty!
         }
@@ -92,6 +91,11 @@ export default class TaskMutations {
     },
   });
 
+  /**
+   * Mutation to update a Task with optimistic updates.
+   * Tip: Read createCategoryMutation for basic comments explaining what's
+   * happening.
+   */
   updateTaskMutation = useMutation(updateTask, {
     onMutate: async ({
       taskId,
@@ -128,13 +132,13 @@ export default class TaskMutations {
               targetCategoryClone.tasks[targetTaskIndex] = optimisticTask;
 
               // Update the target Category with the new data and return it.
-              const oldCategoriesClone = cloneDeep(oldCategories);
-              oldCategoriesClone[targetCategoryIndex] = targetCategoryClone;
-              return oldCategoriesClone;
+
+              oldCategories[targetCategoryIndex] = targetCategoryClone;
+              return oldCategories;
             }
             return oldCategories;
           }
-          return [];
+          return []; // Don't know what to do; return empty!
         }
       );
 
@@ -186,36 +190,62 @@ export default class TaskMutations {
                 ({ id }) => id === fromCategoryId,
                 oldCategories
               );
-            const [toCategoryIndex, toCategoryClone] =
-              findObjectAndIndexCloneDeep(
-                ({ id }) => id === toCategoryId,
-                oldCategories
-              );
             const [targetTaskIndex, targetTaskClone] =
               findObjectAndIndexCloneDeep(
                 ({ id }) => id === taskId,
                 fromCategoryClone?.tasks
               );
 
-            // Move the Task. Remove out of 'from'. Splice/push it into 'to'.
             if (
+              fromCategoryId === toCategoryId &&
               targetTaskClone != null &&
-              toCategoryClone != null &&
               fromCategoryClone != null
             ) {
-              fromCategoryClone?.tasks.splice(targetTaskIndex, 1);
               if (newPosition < 0) {
                 // Add it to the end if newPosition is -1.
-                toCategoryClone?.tasks.push(targetTaskClone);
+                fromCategoryClone?.tasks.push(targetTaskClone);
               } else {
                 // No need to check if newPosition >= length, splice handles it.
-                toCategoryClone?.tasks.splice(newPosition, 0, targetTaskClone);
+                fromCategoryClone?.tasks.splice(
+                  newPosition,
+                  0,
+                  targetTaskClone
+                );
               }
 
-              const oldCategoriesClone = cloneDeep(oldCategories);
-              oldCategoriesClone[fromCategoryIndex] = fromCategoryClone;
-              oldCategoriesClone[toCategoryIndex] = toCategoryClone;
-              return oldCategoriesClone;
+              oldCategories[fromCategoryIndex];
+              return oldCategories;
+            } else {
+              const [toCategoryIndex, toCategoryClone] =
+                findObjectAndIndexCloneDeep(
+                  ({ id }) => id === toCategoryId,
+                  oldCategories
+                );
+
+              // Move the Task. Remove out of 'from'. Splice/push it into 'to'.
+              if (
+                targetTaskClone != null &&
+                toCategoryClone != null &&
+                fromCategoryClone != null
+              ) {
+                fromCategoryClone?.tasks.splice(targetTaskIndex, 1);
+                if (newPosition < 0) {
+                  // Add it to the end if newPosition is -1.
+                  toCategoryClone?.tasks.push(targetTaskClone);
+                } else {
+                  // No need to check if newPosition >= length, splice handles it.
+                  toCategoryClone?.tasks.splice(
+                    newPosition,
+                    0,
+                    targetTaskClone
+                  );
+                }
+
+                oldCategories[fromCategoryIndex] = fromCategoryClone;
+                oldCategories[toCategoryIndex] = toCategoryClone;
+
+                return oldCategories;
+              }
             }
             return oldCategories;
           }
@@ -274,9 +304,8 @@ export default class TaskMutations {
               targetCategoryClone.tasks = optimisticNewTasks;
             }
             if (targetCategoryClone != null) {
-              const oldCategoriesClone = cloneDeep(oldCategories);
-              oldCategoriesClone[targetCategoryIndex] = targetCategoryClone;
-              return oldCategoriesClone;
+              oldCategories[targetCategoryIndex] = targetCategoryClone;
+              return oldCategories;
             }
             return oldCategories;
           }

@@ -1,10 +1,14 @@
+import { useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';
-import useHover from '../../hooks/useHover';
+import mergeRefs from 'react-merge-refs';
 
+import useHideOnClickOutside from '../../hooks/useHideOnClickOutside';
+import useHover from '../../hooks/useHover';
 import CategoryMutations from '../../mutations/category.mutations';
 import { EntityType } from '../../types/api.types';
 import { CategoryEntity, EntityId } from '../../types/entity.types';
 
+import TitleStringInput from '../Common/Inputs/TitleStringInput';
 import { MoveAndUpdateControls } from '../Common/MoveAndUpdateControls';
 import { NewEntity } from '../NewEntity';
 import { Task } from '../Task';
@@ -13,6 +17,7 @@ import {
   CategoryControlsContainer,
   CategoryTitle,
   CategoryTitleRow,
+  CategoryTitleRowLeft,
   TasksList,
 } from './Category.styles';
 
@@ -28,18 +33,69 @@ export function Category({
   leftCategoryId,
   rightCategoryId,
 }: CategoryProps) {
-  const [hoverRef, hovering] = useHover<HTMLDivElement>('enter');
-
   const queryClient = useQueryClient();
 
   const categoryMutations = new CategoryMutations(queryClient);
 
+  const [hoverRef, hovering] = useHover<HTMLDivElement>('enter');
+  const [expanded, setExpanded, clickOutsideRef] =
+    useHideOnClickOutside<HTMLDivElement>(false);
+
+  const [editMode, setEditMode] = useState(false);
+  const [titleEdit, setTitleEdit] = useState(category.title);
+
+  useEffect(() => {
+    if (!expanded || !editMode) {
+      if (editMode) {
+        setEditMode(false);
+      }
+      // Reset the edits on leaving editMode or collapsing the Task.
+      setTitleEdit(category.title);
+    }
+
+    // Update with the next refresh.
+    if (!editMode && titleEdit !== category.title) {
+      setTitleEdit(category.title);
+    }
+  }, [editMode, expanded, titleEdit, category.title]);
+
+  const submitUpdate = () => {
+    if (titleEdit.trim() === '') {
+      return;
+    }
+
+    categoryMutations.updateCategoryMutation.mutate({
+      categoryId: category.id,
+      updateCategoryDto: { title: titleEdit },
+    });
+    setEditMode(false);
+  };
+
   return (
     <CategoryContainer>
-      <CategoryTitleRow ref={hoverRef}>
-        <CategoryTitle>{category.title}</CategoryTitle>
+      <CategoryTitleRow
+        ref={mergeRefs([hoverRef, clickOutsideRef])}
+        onClick={() => {
+          if (!expanded) setExpanded(true); // Only outside click closes.
+        }}
+      >
+        <CategoryTitleRowLeft>
+          {expanded && editMode ? (
+            <TitleStringInput
+              title={titleEdit}
+              setTitle={setTitleEdit}
+              submit={submitUpdate}
+              placeholder="Category Title"
+            />
+          ) : (
+            <CategoryTitle>{category.title}</CategoryTitle>
+          )}
+        </CategoryTitleRowLeft>
         <CategoryControlsContainer>
           <MoveAndUpdateControls
+            openEdit={() => setEditMode(!editMode)}
+            show={hovering}
+            mode={expanded ? 'edit' : 'move'}
             disableMoveLeft={leftCategoryId == null}
             disableMoveRight={rightCategoryId == null}
             moveLeft={() =>
@@ -59,16 +115,16 @@ export function Category({
                 categoryId: category.id,
               })
             }
-            show={hovering}
-            mode={'move'}
           />
         </CategoryControlsContainer>
       </CategoryTitleRow>
       <TasksList>
-        {category.tasks.map((task) => (
+        {category.tasks.map((task, taskIndex, { length: tasksCount }) => (
           <Task
-            key={task.id}
+            key={`${taskIndex}_${task.lexical_order}_${task.id}`}
             task={task}
+            taskIndex={taskIndex}
+            tasksCount={tasksCount}
             categoryId={category.id}
             leftCategoryId={leftCategoryId}
             rightCategoryId={rightCategoryId}

@@ -23,7 +23,7 @@ export const TaskTitleRow = styled.div`
   align-items: center;
 `;
 
-export const TaskTitle = styled.div`
+export const TaskTitleRowLeft = styled.div`
   flex-grow: 1;
   padding: 0.5rem 1rem;
 `;

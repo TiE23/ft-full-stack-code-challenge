@@ -16,13 +16,18 @@ export const CategoryTitleRow = styled.div`
   flex-wrap: nowrap;
   justify-content: space-between;
   align-items: center;
+
+  cursor: pointer;
+`;
+
+export const CategoryTitleRowLeft = styled.div`
+  flex-grow: 1;
+  padding: 0.5rem 0 1rem;
 `;
 
 export const CategoryTitle = styled.div`
   font-weight: bold;
-  text-align: center;
-
-  padding: 0.5rem 0 1rem;
+  text-align: start;
 `;
 
 export const CategoryControlsContainer = styled.div`

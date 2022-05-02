@@ -1,17 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';
 import useMeasure from 'react-use-measure';
-import useFocus from '../../hooks/useFocus';
 
 import useHideOnClickOutside from '../../hooks/useHideOnClickOutside';
 import useHover from '../../hooks/useHover';
 import TaskMutations from '../../mutations/task.mutations';
 import { EntityId, TaskEntity } from '../../types/entity.types';
-import { listenForEnter } from '../../utils/common.utils';
 import { parseAndPrintDate } from '../../utils/display.utils';
 
-import StringInput from '../Common/Inputs/StringInput.styled';
 import { MoveAndUpdateControls } from '../Common/MoveAndUpdateControls';
+import TitleStringInput from '../Common/Inputs/TitleStringInput';
 import {
   TaskContainer,
   TaskControlsContainer,
@@ -19,12 +17,14 @@ import {
   TaskDatesGrid,
   TaskExpandedArea,
   TaskExpandedContent,
-  TaskTitle,
   TaskTitleRow,
+  TaskTitleRowLeft,
 } from './Task.styles';
 
 export interface TaskProps {
   task: TaskEntity;
+  taskIndex: number;
+  tasksCount: number;
   categoryId: EntityId;
   leftCategoryId?: EntityId;
   rightCategoryId?: EntityId;
@@ -32,6 +32,8 @@ export interface TaskProps {
 
 export function Task({
   task,
+  taskIndex,
+  tasksCount,
   categoryId,
   leftCategoryId,
   rightCategoryId,
@@ -56,7 +58,12 @@ export function Task({
       // Reset the edits on leaving editMode or collapsing the Task.
       setTitleEdit(task.title);
     }
-  }, [editMode, expanded]);
+
+    // Update with the next refresh.
+    if (!editMode && titleEdit !== task.title) {
+      setTitleEdit(task.title);
+    }
+  }, [editMode, expanded, titleEdit, task.title]);
 
   const submitUpdate = () => {
     if (titleEdit.trim() === '') {
@@ -79,20 +86,26 @@ export function Task({
       }}
     >
       <TaskTitleRow ref={hoverRef}>
-        <TaskTitle>
+        <TaskTitleRowLeft>
           {expanded && editMode ? (
             <TitleStringInput
               title={titleEdit}
               setTitle={setTitleEdit}
               submit={submitUpdate}
+              placeholder="Task Title"
             />
           ) : (
             task.title
           )}
-        </TaskTitle>
+        </TaskTitleRowLeft>
         <TaskControlsContainer>
           <MoveAndUpdateControls
+            openEdit={() => setEditMode(!editMode)}
+            show={hovering}
+            mode={expanded ? 'edit' : 'move'}
             disableMoveLeft={leftCategoryId == null}
+            disableMoveDown={taskIndex === tasksCount - 1}
+            disableMoveUp={taskIndex <= 0}
             disableMoveRight={rightCategoryId == null}
             moveLeft={() =>
               taskMutations.moveTaskMutation.mutate({
@@ -100,6 +113,22 @@ export function Task({
                 fromCategoryId: categoryId,
                 toCategoryId: leftCategoryId!, // Coax TS a little here...
                 newPosition: -1, // To the end.
+              })
+            }
+            moveDown={() =>
+              taskMutations.moveTaskMutation.mutate({
+                taskId: task.id,
+                fromCategoryId: categoryId,
+                toCategoryId: categoryId,
+                newPosition: taskIndex + 1,
+              })
+            }
+            moveUp={() =>
+              taskMutations.moveTaskMutation.mutate({
+                taskId: task.id,
+                fromCategoryId: categoryId,
+                toCategoryId: categoryId,
+                newPosition: taskIndex - 1,
               })
             }
             moveRight={() =>
@@ -116,12 +145,6 @@ export function Task({
                 categoryId,
               })
             }
-            openEdit={() => {
-              console.log('openEdit', !editMode);
-              setEditMode(!editMode);
-            }}
-            show={hovering}
-            mode={expanded ? 'edit' : 'move'}
           />
         </TaskControlsContainer>
       </TaskTitleRow>
@@ -136,29 +159,5 @@ export function Task({
         </TaskExpandedContent>
       </TaskExpandedArea>
     </TaskContainer>
-  );
-}
-
-interface TitleStringInputProps {
-  title: string;
-  setTitle: React.Dispatch<React.SetStateAction<string>>;
-  submit: VoidFunction;
-}
-/**
- * This needs to be its own component for useFocus() to work. Literally the only
- * reason.
- * @param props
- * @returns
- */
-function TitleStringInput({ title, setTitle, submit }: TitleStringInputProps) {
-  const inputRef = useFocus();
-  return (
-    <StringInput
-      ref={inputRef}
-      value={title}
-      onChange={(e) => setTitle(e.target.value)}
-      onKeyPress={listenForEnter(submit)}
-      placeholder="Task Title"
-    />
   );
 }

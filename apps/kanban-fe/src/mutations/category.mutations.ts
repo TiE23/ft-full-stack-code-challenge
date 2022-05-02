@@ -9,6 +9,8 @@ import {
   deleteCategoryVariables,
   repositionCategory,
   repositionCategoryVariables,
+  updateCategory,
+  updateCategoryVariables,
 } from '../api/category.api';
 import { CategoryEntity } from '../types/entity.types';
 import { findObjectAndIndexCloneDeep } from '../utils/common.utils';
@@ -79,6 +81,68 @@ export default class CategoryMutations {
     },
   });
 
+  /**
+   * Mutation to update a Category with optimistic updates.
+   * Tip: Read createCategoryMutation for basic comments explaining what's
+   * happening.
+   */
+  updateCategoryMutation = useMutation(updateCategory, {
+    onMutate: async ({
+      categoryId,
+      updateCategoryDto,
+    }: updateCategoryVariables) => {
+      await this.queryClient.cancelQueries('categories');
+
+      const previousCategories =
+        this.queryClient.getQueryData<CategoryEntity[]>('categories');
+
+      this.queryClient.setQueryData<CategoryEntity[]>(
+        'categories',
+        (oldCategories) => {
+          if (oldCategories != null) {
+            const [targetCategoryIndex, targetCategoryClone] =
+              findObjectAndIndexCloneDeep(
+                ({ id }) => id === categoryId,
+                oldCategories
+              );
+
+            if (targetCategoryClone != null) {
+              const optimisticCategory: CategoryEntity = {
+                ...targetCategoryClone,
+                ...updateCategoryDto,
+              };
+
+              oldCategories[targetCategoryIndex] = optimisticCategory;
+              return oldCategories;
+            }
+          }
+          return []; // Don't know what to do; return empty!
+        }
+      );
+
+      return { previousCategories };
+    },
+    onError: (err, _, context) => {
+      if (context?.previousCategories) {
+        this.queryClient.setQueryData<CategoryEntity[]>(
+          'categories',
+          context.previousCategories
+        );
+      }
+      toast.error(
+        `An error occurred while updating Category${
+          err ? `\n${String(err)}` : ''
+        }`
+      );
+    },
+    onSettled: () => {
+      this.queryClient.invalidateQueries('categories');
+    },
+    onSuccess: (category) => {
+      toast.success(`Category "${category.title}" updated!`);
+    },
+  });
+
   repositionCategoryMutation = useMutation(repositionCategory, {
     onMutate: async ({
       categoryId,
@@ -109,11 +173,10 @@ export default class CategoryMutations {
                 return oldCategories;
               }
 
-              const oldCategoriesClone = cloneDeep(oldCategories);
-              oldCategoriesClone.splice(targetCategoryIndex, 1);
+              oldCategories.splice(targetCategoryIndex, 1);
 
-              oldCategoriesClone.splice(newPosition, 0, targetCategoryClone);
-              return oldCategoriesClone;
+              oldCategories.splice(newPosition, 0, targetCategoryClone);
+              return oldCategories;
             } else if (oldCategories != null) {
               return oldCategories;
             }
