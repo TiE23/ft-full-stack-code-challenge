@@ -19,16 +19,17 @@ export async function updateTask({
 
 export interface moveAndRepositionTaskVariables {
   taskId: EntityId;
-  categoryId: EntityId;
+  fromCategoryId: EntityId; // Only used in Mutation.
+  toCategoryId: EntityId;
   newPosition: number;
 }
 export async function moveAndRepositionTask({
   taskId,
-  categoryId,
+  toCategoryId,
   newPosition,
 }: moveAndRepositionTaskVariables): Promise<TaskEntity> {
   const response = await apiClient.patch<TaskEntity>(
-    `/task/${taskId}/moveto/${categoryId}/${newPosition}`
+    `/task/${taskId}/moveto/${toCategoryId}/${newPosition}`
   );
   return response.data;
 }

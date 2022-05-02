@@ -34,6 +34,9 @@ export function NewEntityForm({
 
   const queryClient = useQueryClient();
 
+  /**
+   * Mutation to create new Categories with optimistic updates.
+   */
   const createCategoryMutation = useMutation(createCategory, {
     // Must define the return type explicitly due to a TS <4.7 limitation.
     onMutate: async ({ createCategoryDto }: createCategoryVariables) => {
@@ -82,7 +85,11 @@ export function NewEntityForm({
     },
   });
 
+  /**
+   * Mutation to create new Tasks (added to a Category) with optimistic updates.
+   */
   const createTaskMutation = useMutation(addTask, {
+    // Performing optimistic updates.
     onMutate: async ({ categoryId, createTaskDto }: addTaskVariables) => {
       await queryClient.cancelQueries('categories');
 

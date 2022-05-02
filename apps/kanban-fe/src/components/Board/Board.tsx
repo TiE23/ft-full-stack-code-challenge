@@ -24,10 +24,16 @@ export function Board() {
   if (data == null) {
     return <span>Could not load</span>;
   }
+
   return (
     <BoardBase>
-      {data!.map((category) => (
-        <Category key={category.id} category={category} />
+      {data!.map((category, index, categories) => (
+        <Category
+          key={category.id}
+          category={category}
+          leftCategoryId={categories[index - 1]?.id} // JS is so easy.
+          rightCategoryId={categories[index + 1]?.id}
+        />
       ))}
       <NewEntity entityType={EntityType.CATEGORY} />
     </BoardBase>

@@ -1,15 +1,29 @@
 # Kyle's Comments
 
-Hey Jamie and the rest of the Flashtract family. Here's just some of my own notes.
+Hey Jamie and the rest of the Flashtract family! I just wanted to grab this challenge and treat it like a personal project of mine. To, in short amount of time, build it in such a way that I feel would provide a full impression of how I work. I told Jamie that I like to create solutions that aren't just hacks or quick "good-enoughs", so even with just a take-home project I wanted to build it at a professional level... if said professional was trying to speedrun the build of a good app. 😆
 
-- On Tueday I was given the assignment and read the general description and little else
-- On Wednesday I studied up on NestJS, TypeORM, SQLite, and React-Query
+Here's just some of my own notes.
+
+## Progress Summary
+
+- On Tueday I was given the assignment and read the general description and little else.
+- On Wednesday I studied up on NestJS, TypeORM, SQLite, and React-Query.
 - On Thursday I started writing the backend. I ran into a lot of friction just trying to get TypeORM to behave within NestJS but by the end of the day I was starting to stretch my legs
-- On Friday I finished the backend and made some design changes. Then started writing unit tests for the back end.
+- On Friday I finished the backend and made some design changes. Then started writing unit tests for the backend.
+- On Saturday I spent most of the day figuring out how to correctly run e2e tests for the backend. It was a pretty amazing learning experience to be honest. Discovered in-memory sqlite instances was just a string away. Figured out how to manipulate internal tables to reset auto-increment counts for tables I clear. In general it was a ton of interesting work. I also went back and made some fixes to the backend as I wrote tests and went "oh, right, I didn't consider that case!"
+- On Sunday it was a blitz to the finish in the frontend. Oh man, this was a lot of fun to do quickly.
 
-## About the Back End
+## About the Backend
 
-I wrote this app using Node v16.13.0. So, if something goes wrong, that's probably the reason. ;)
+I wrote this app using Node v16.13.0. So, if something goes wrong, please try adjusting your nvm first.
+
+Knowing what I wanted to build on the frontend I just went whole-hog and dove into 100% exclusively back-end development. Learning to build it with your team's style of using Nest and TypeORM proved to be a real learning experience as I haven't encountered them before. But as a result, I think they both have a new fan (me).
+
+I used Postman (folder config committed to root) for most of my fiddling.
+
+I didn't maybe build the most production-ready solution, and I might've chosen to use params more often than some might like (yes, I will admit that moving and repositioning a Task from one Category to another with an endpoint of `':taskId/moveto/:categoryId/:newPosition'` is maybe weird - I just went with it!), and I chose a fun but weird ordering solution involving "lexical sorting", but I really just had a lot of fun with it.
+
+Oh, and yes, I wrote a full suite of e2e test using a test database. Every Taska and Category endpoint is covered.
 
 ## Daily Notes
 
@@ -17,9 +31,9 @@ These aren't important to read, they were mostly for myself. This was a learning
 
 ### Thursday Notes
 
-1. Trying to get SQLite to build on my Apple Silicon MBP as a dependency of the sqlite3 module was a pain. Nothing like starting a project that could get you a job and the simply running yarn install results in ugly, ugly errors. Turns out I never did install XCode on this laptop when I first got it 2 months ago. As a result the build process that used Python wouldn't work and it took me some research to find my solution.
-2. Woah, NestJS is pretty cool. I like the structure it gives you. Lets you not have to answer for your design choices as you get to just go "because NestJS said so!"
-3. Took me a bit to realize that TypeORM's documentation was changed. 0.3.0 of that module seriously changed a lot of things and as a result the documentation was a bit too new for the version (0.2.44) that we are using here. It's important to use 0.2.44 because the documentation for NestJS's guidance on using TypeORM uses the older verison. Support is probably weeks - if not months - away.
+1. Trying to get SQLite to build on my Apple Silicon MBP as a dependency of the **Sqlite3** module was a pain. Nothing like starting a project that could get you a job and the simply running yarn install results in ugly, ugly errors. Turns out I never did install XCode on this laptop when I first got it 2 months ago. As a result the build process that used Python wouldn't work and it took me some research to find my solution.
+2. Woah, **NestJS** is pretty cool. I like the structure it gives you. Lets you not have to answer for your design choices as you get to just go "because NestJS said so!"
+3. Took me a bit to realize that **TypeORM**'s documentation was changed. 0.3.0 of that module seriously changed a lot of things and as a result the documentation was a bit too new for the version (0.2.44) that we are using here. It's important to use 0.2.44 because the documentation for NestJS's guidance on using TypeORM uses the older verison. Support is probably weeks - if not months - away.
 4. I spent some time looking up how to automatically delete Tasks that belonged to a Category that was deleted and it lead to some back configurations that I was only able to figure out by looking up the like [5th GitHub task](https://github.com/typeorm/typeorm/issues/1460#issuecomment-383715715) that mentioned the error I was getting. Turns out you need to use `onDelete: 'CASCADE'` option in a @ManyToOne relation.
 5. lol the first time I ran my PATCH route to move a Task from one Category to another worked flawlessly the first time I tried it. Nothing but net on that one, buddy!
 6. I want to figure out validation and more friendly and informative exception handling. First stop is checking out Pipes in NestJS. ParseIntPipe is a good first step.
@@ -54,7 +68,7 @@ These aren't important to read, they were mostly for myself. This was a learning
 
 ### Sunday Notes
 
-1. Blitz time for the front end! I've already learned a lot for this challenge on the back end so I'm just going to skip ChakraUI and just go with home-grown styled-components and a theme.
+1. Blitz time for the front end! I've already learned a lot for this challenge on the backend so I'm just going to skip ChakraUI and just go with home-grown styled-components and a theme.
 2. Defining API functions using Axios immediately. Just taking care of the basic things I can just do right away.
 3. Hey, using NX to generate new components is pretty fun.
 4. Practicing "composable" styling where I do not define positioning or padding for a component and instead only let components position and space child components. This is something I learned from the creator of [Bedrock-Layouts](https://github.com/Bedrock-Layouts/Bedrock)
@@ -63,3 +77,5 @@ These aren't important to read, they were mostly for myself. This was a learning
 7. Ran into an issue with TypeScript not being happy with react-query's optimistic updates. Seeing some [others talking about it](https://github.com/tannerlinsley/react-query/discussions/3434) it appears to be a limitation with TypeScript and I need to explicitly define the return type from getQueryData(). Neat info is this [might be fixed in TypeScript 4.7](https://tkdodo.eu/blog/react-query-and-type-script#optimistic-updates).
 8. Hoo, mutation args threw me off. Very thankful for [this excellent guide](https://medium.com/swlh/how-to-use-multiple-parameters-in-usemutation-from-react-query-with-typescript-7e2aeec51446).
 9. I love TypeScript. I swear it makes JavaScript fun. Discriminating unions, when they fit perfect, feel so good.
+10. I have grand plans to add drag-and-drop abilities to the project but for now I'm working on the simple left/right buttons.
+11. I love JavaScript in general. With nullish coalescing you can just throw indicies at an array and if it doesn't exist not only do you not get some exception like you would get in pretty much every other language but you can then check, without fear of error, if a property is available on a particular object in said array.
