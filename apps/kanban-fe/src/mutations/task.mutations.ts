@@ -147,7 +147,10 @@ export default class TaskMutations {
             oldCategoriesClone[fromCategoryIndex] = fromCategoryClone;
             oldCategoriesClone[toCategoryIndex] = toCategoryClone;
             return oldCategoriesClone;
+          } else if (oldCategories != null) {
+            return oldCategories;
           }
+
           return [];
         }
       );
@@ -206,7 +209,10 @@ export default class TaskMutations {
             const oldCategoriesClone = cloneDeep(oldCategories);
             oldCategoriesClone[targetCategoryIndex] = targetCategoryClone;
             return oldCategoriesClone;
+          } else if (oldCategories != null) {
+            return oldCategories;
           }
+
           return [];
         }
       );

@@ -10,7 +10,6 @@ import {
   repositionCategory,
   repositionCategoryVariables,
 } from '../api/category.api';
-import { Possible } from '../types/common.types';
 import { CategoryEntity } from '../types/entity.types';
 import { findObjectAndIndexCloneDeep } from '../utils/common.utils';
 import { createOptimisticCategory } from '../utils/entity.utils';
@@ -118,7 +117,10 @@ export default class CategoryMutations {
 
             oldCategoriesClone.splice(newPosition, 0, targetCategoryClone);
             return oldCategoriesClone;
+          } else if (oldCategories != null) {
+            return oldCategories;
           }
+
           return [];
         }
       );
