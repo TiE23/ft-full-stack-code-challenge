@@ -11,10 +11,7 @@ import {
 } from '../api/task.api';
 import { CategoryEntity } from '../types/entity.types';
 import { findObjectAndIndexCloneDeep } from '../utils/common.utils';
-import {
-  createOptimisticCategory,
-  createOptimisticTask,
-} from '../utils/entity.utils';
+import { createOptimisticTask } from '../utils/entity.utils';
 
 /**
  * Mutations for Tasks.. though, everything updates the 'categories' query in
@@ -43,27 +40,28 @@ export default class TaskMutations {
       const previousCategories =
         this.queryClient.getQueryData<CategoryEntity[]>('categories');
 
-      const previousCategory = previousCategories?.find(
-        (category) => category.id === categoryId
-      );
-
-      // Insert an optimistic new Task into the optimistic Category.
-      const optimisticNewTask = createOptimisticTask(createTaskDto);
-      const optimisticNewTasks = previousCategory
-        ? [...previousCategory.tasks, optimisticNewTask]
-        : [];
-      const optimisticNewCategory = createOptimisticCategory(
-        undefined,
-        optimisticNewTasks
-      );
-
       this.queryClient.setQueryData<CategoryEntity[]>(
         'categories',
         (oldCategories) => {
-          if (oldCategories == null) {
-            return [optimisticNewCategory];
+          if (oldCategories != null) {
+            const oldCategoriesClone = cloneDeep(oldCategories!);
+            const [targetCategoryIndex, targetCategoryClone] =
+              findObjectAndIndexCloneDeep(
+                ({ id }) => id === categoryId,
+                oldCategories
+              );
+
+            if (targetCategoryClone != null) {
+              const optimisticNewTask = createOptimisticTask(createTaskDto);
+
+              // Insert an optimistic new Task into the Category.
+              targetCategoryClone.tasks.push(optimisticNewTask);
+              oldCategoriesClone[targetCategoryIndex] = targetCategoryClone;
+            }
+
+            return oldCategoriesClone;
           }
-          return [...oldCategories, optimisticNewCategory];
+          return []; // Don't know what to do; return empty!
         }
       );
 
@@ -110,48 +108,47 @@ export default class TaskMutations {
       const previousCategories =
         this.queryClient.getQueryData<CategoryEntity[]>('categories');
 
-      const [fromCategoryIndex, fromCategoryClone] =
-        findObjectAndIndexCloneDeep(
-          (category) => category.id === fromCategoryId,
-          previousCategories
-        );
-      const [toCategoryIndex, toCategoryClone] = findObjectAndIndexCloneDeep(
-        (category) => category.id === toCategoryId,
-        previousCategories
-      );
-      const [targetTaskIndex, targetTaskClone] = findObjectAndIndexCloneDeep(
-        (task) => task.id === taskId,
-        fromCategoryClone?.tasks
-      );
-
-      // Move the Task. Remove out of 'from'. Splice/push it into 'to'.
-      if (targetTaskClone != null) {
-        fromCategoryClone?.tasks.splice(targetTaskIndex, 1);
-        if (newPosition < 0) {
-          // Add it to the end if newPosition is -1.
-          toCategoryClone?.tasks.push(targetTaskClone);
-        } else {
-          toCategoryClone?.tasks.splice(newPosition, 0, targetTaskClone);
-        }
-      }
-
       this.queryClient.setQueryData<CategoryEntity[]>(
         'categories',
         (oldCategories) => {
-          if (
-            oldCategories != null &&
-            toCategoryClone != null &&
-            fromCategoryClone != null
-          ) {
-            const oldCategoriesClone = cloneDeep(oldCategories);
-            oldCategoriesClone[fromCategoryIndex] = fromCategoryClone;
-            oldCategoriesClone[toCategoryIndex] = toCategoryClone;
-            return oldCategoriesClone;
-          } else if (oldCategories != null) {
+          if (oldCategories != null) {
+            const [fromCategoryIndex, fromCategoryClone] =
+              findObjectAndIndexCloneDeep(
+                ({ id }) => id === fromCategoryId,
+                oldCategories
+              );
+            const [toCategoryIndex, toCategoryClone] =
+              findObjectAndIndexCloneDeep(
+                ({ id }) => id === toCategoryId,
+                oldCategories
+              );
+            const [targetTaskIndex, targetTaskClone] =
+              findObjectAndIndexCloneDeep(
+                ({ id }) => id === taskId,
+                fromCategoryClone?.tasks
+              );
+
+            // Move the Task. Remove out of 'from'. Splice/push it into 'to'.
+            if (targetTaskClone != null) {
+              fromCategoryClone?.tasks.splice(targetTaskIndex, 1);
+              if (newPosition < 0) {
+                // Add it to the end if newPosition is -1.
+                toCategoryClone?.tasks.push(targetTaskClone);
+              } else {
+                // No need to check if newPosition >= length, splice handles it.
+                toCategoryClone?.tasks.splice(newPosition, 0, targetTaskClone);
+              }
+            }
+
+            if (toCategoryClone != null && fromCategoryClone != null) {
+              const oldCategoriesClone = cloneDeep(oldCategories);
+              oldCategoriesClone[fromCategoryIndex] = fromCategoryClone;
+              oldCategoriesClone[toCategoryIndex] = toCategoryClone;
+              return oldCategoriesClone;
+            }
             return oldCategories;
           }
-
-          return [];
+          return []; // Don't know what to do; return empty!
         }
       );
       return { previousCategories };
@@ -187,33 +184,32 @@ export default class TaskMutations {
       const previousCategories =
         this.queryClient.getQueryData<CategoryEntity[]>('categories');
 
-      const [targetCategoryIndex, targetCategoryClone] =
-        findObjectAndIndexCloneDeep(
-          (category) => category.id === categoryId,
-          previousCategories
-        );
-
-      if (targetCategoryClone != null) {
-        const optimisticNewTasks = cloneDeep(
-          targetCategoryClone
-            ? targetCategoryClone?.tasks.filter((task) => task.id !== taskId)
-            : []
-        );
-        targetCategoryClone.tasks = optimisticNewTasks;
-      }
-
       this.queryClient.setQueryData<CategoryEntity[]>(
         'categories',
         (oldCategories) => {
-          if (oldCategories != null && targetCategoryClone != null) {
-            const oldCategoriesClone = cloneDeep(oldCategories);
-            oldCategoriesClone[targetCategoryIndex] = targetCategoryClone;
-            return oldCategoriesClone;
-          } else if (oldCategories != null) {
+          if (oldCategories != null) {
+            const [targetCategoryIndex, targetCategoryClone] =
+              findObjectAndIndexCloneDeep(
+                ({ id }) => id === categoryId,
+                oldCategories
+              );
+
+            if (targetCategoryClone != null) {
+              const optimisticNewTasks = cloneDeep(
+                targetCategoryClone
+                  ? targetCategoryClone?.tasks.filter(({ id }) => id !== taskId)
+                  : []
+              );
+              targetCategoryClone.tasks = optimisticNewTasks;
+            }
+            if (targetCategoryClone != null) {
+              const oldCategoriesClone = cloneDeep(oldCategories);
+              oldCategoriesClone[targetCategoryIndex] = targetCategoryClone;
+              return oldCategoriesClone;
+            }
             return oldCategories;
           }
-
-          return [];
+          return []; // Don't know what to do; return empty!
         }
       );
 

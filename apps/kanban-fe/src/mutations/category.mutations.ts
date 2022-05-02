@@ -39,16 +39,16 @@ export default class CategoryMutations {
         // Must also define explictly here.
         this.queryClient.getQueryData<CategoryEntity[]>('categories');
 
-      const optimisticNewCategory = createOptimisticCategory(createCategoryDto);
-
       // Optimistically update to the new value.
       this.queryClient.setQueryData<CategoryEntity[]>(
         'categories',
         (oldCategories) => {
-          if (oldCategories == null) {
-            return [optimisticNewCategory];
-          } else {
+          const optimisticNewCategory =
+            createOptimisticCategory(createCategoryDto);
+          if (oldCategories != null) {
             return [...oldCategories, optimisticNewCategory];
+          } else {
+            return [optimisticNewCategory];
           }
         }
       );
@@ -89,39 +89,36 @@ export default class CategoryMutations {
       const previousCategories =
         this.queryClient.getQueryData<CategoryEntity[]>('categories');
 
-      const [targetCategoryIndex, targetCategoryClone] =
-        findObjectAndIndexCloneDeep(
-          (category) => category.id === categoryId,
-          previousCategories
-        );
-
       this.queryClient.setQueryData<CategoryEntity[]>(
         'categories',
         (oldCategories) => {
-          if (oldCategories != null && targetCategoryClone != null) {
-            if (
-              newPosition === targetCategoryIndex ||
-              newPosition >= oldCategories.length ||
-              newPosition < 0
-            ) {
-              // No change in position or
-              // trying to move beyond end of array or before 0.
+          if (oldCategories != null) {
+            const [targetCategoryIndex, targetCategoryClone] =
+              findObjectAndIndexCloneDeep(
+                ({ id }) => id === categoryId,
+                oldCategories
+              );
+            if (targetCategoryClone != null) {
+              if (
+                newPosition === targetCategoryIndex ||
+                newPosition >= oldCategories.length ||
+                newPosition < 0
+              ) {
+                // No change in position or
+                // trying to move beyond end of array or before 0.
+                return oldCategories;
+              }
+
+              const oldCategoriesClone = cloneDeep(oldCategories);
+              oldCategoriesClone.splice(targetCategoryIndex, 1);
+
+              oldCategoriesClone.splice(newPosition, 0, targetCategoryClone);
+              return oldCategoriesClone;
+            } else if (oldCategories != null) {
               return oldCategories;
             }
-
-            const oldCategoriesClone = cloneDeep(oldCategories);
-            oldCategoriesClone.splice(targetCategoryIndex, 1);
-
-            const position =
-              newPosition > targetCategoryIndex ? newPosition : newPosition - 1;
-
-            oldCategoriesClone.splice(newPosition, 0, targetCategoryClone);
-            return oldCategoriesClone;
-          } else if (oldCategories != null) {
-            return oldCategories;
           }
-
-          return [];
+          return []; // Don't know what to do; return empty!
         }
       );
       return { previousCategories };
@@ -161,9 +158,7 @@ export default class CategoryMutations {
         'categories',
         (oldCategories) => {
           if (oldCategories != null) {
-            return oldCategories.filter(
-              (category) => category.id !== categoryId
-            );
+            return oldCategories.filter(({ id }) => id !== categoryId);
           }
           return [];
         }
