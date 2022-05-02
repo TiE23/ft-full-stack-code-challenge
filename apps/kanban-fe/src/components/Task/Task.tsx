@@ -1,11 +1,11 @@
-import { useState } from 'react';
 import { useQueryClient } from 'react-query';
+import useMeasure from 'react-use-measure';
+
 import useHideOnClickOutside from '../../hooks/useHideOnClickOutside';
-
 import TaskMutations from '../../mutations/task.mutations';
-
 import { EntityId, TaskEntity } from '../../types/entity.types';
 import { parseAndPrintDate } from '../../utils/display.utils';
+
 import { MoveAndDeleteControls } from '../Common';
 import {
   TaskContainer,
@@ -32,6 +32,7 @@ export function Task({
 }: TaskProps) {
   const [expanded, setExpanded, ref] =
     useHideOnClickOutside<HTMLDivElement>(false);
+  const [bottomRef, { height: bottomHeight }] = useMeasure();
 
   const queryClient = useQueryClient();
 
@@ -70,8 +71,8 @@ export function Task({
           }
         />
       </TaskTitleRow>
-      <TaskExpandedArea expanded={expanded}>
-        <TaskExpandedContent>
+      <TaskExpandedArea expanded={expanded} expandedHeightPx={bottomHeight}>
+        <TaskExpandedContent ref={bottomRef}>
           <TaskDatesGrid>
             <TaskDate>Updated</TaskDate>
             <TaskDate>{parseAndPrintDate(task.updated_at)}</TaskDate>

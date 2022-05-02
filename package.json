@@ -33,6 +33,7 @@
     "react-hot-toast": "^2.2.0",
     "react-is": "18.0.0",
     "react-query": "^3.34.16",
+    "react-use-measure": "^2.1.1",
     "reflect-metadata": "^0.1.13",
     "regenerator-runtime": "0.13.9",
     "rxjs": "^7.5.4",

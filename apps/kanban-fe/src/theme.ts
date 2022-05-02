@@ -27,6 +27,7 @@ export const theme = {
       expandedBgColor: '#f7f7f7',
       fadedTextColor: '#404040',
       radiusPx: 3,
+      boxShadow: '#091e4240 0px 1px 0px 0px',
     },
     newEntity: {
       radiusPx: 3,
