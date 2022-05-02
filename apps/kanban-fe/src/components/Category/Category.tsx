@@ -5,7 +5,7 @@ import CategoryMutations from '../../mutations/category.mutations';
 import { EntityType } from '../../types/api.types';
 import { CategoryEntity, EntityId } from '../../types/entity.types';
 
-import { MoveAndDeleteControls } from '../Common';
+import { MoveAndUpdateControls } from '../Common/MoveAndUpdateControls';
 import { NewEntity } from '../NewEntity';
 import { Task } from '../Task';
 import {
@@ -39,7 +39,7 @@ export function Category({
       <CategoryTitleRow ref={hoverRef}>
         <CategoryTitle>{category.title}</CategoryTitle>
         <CategoryControlsContainer>
-          <MoveAndDeleteControls
+          <MoveAndUpdateControls
             disableMoveLeft={leftCategoryId == null}
             disableMoveRight={rightCategoryId == null}
             moveLeft={() =>

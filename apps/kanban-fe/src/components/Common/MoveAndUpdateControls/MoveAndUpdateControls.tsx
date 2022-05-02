@@ -4,21 +4,21 @@ import {
   DeleteIcon,
   EditIcon,
 } from '@chakra-ui/icons';
-import { theme } from '../../theme';
+import { theme } from '../../../theme';
 import { useTransition } from '@react-spring/web';
 import useMeasure from 'react-use-measure';
 
-import { Percent } from '../../types/styling.types';
+import { Percent } from '../../../types/styling.types';
 
 import {
   AnimatedControlsSection,
   AnimatedEditSection,
   ControlsContainer,
   NoStyleButton,
-} from './MoveAndDeleteControls.styles';
+} from './MoveAndUpdateControls.styles';
 import { useEffect, useState } from 'react';
 
-interface MoveAndDeleteControlsProps {
+interface MoveAndUpdateControlsProps {
   disableMoveLeft: boolean;
   disableMoveRight: boolean;
   moveLeft: VoidFunction;
@@ -30,7 +30,7 @@ interface MoveAndDeleteControlsProps {
   opacityMin?: Percent;
 }
 
-export function MoveAndDeleteControls({
+export function MoveAndUpdateControls({
   disableMoveLeft,
   disableMoveRight,
   moveLeft,
@@ -40,7 +40,7 @@ export function MoveAndDeleteControls({
   mode,
   show = true,
   opacityMin = 0,
-}: MoveAndDeleteControlsProps) {
+}: MoveAndUpdateControlsProps) {
   const transition = useTransition(mode === 'edit', {
     from: { position: 'absolute', opacity: 0 },
     enter: { opacity: 1 },

@@ -8,7 +8,7 @@ import TaskMutations from '../../mutations/task.mutations';
 import { EntityId, TaskEntity } from '../../types/entity.types';
 import { parseAndPrintDate } from '../../utils/display.utils';
 
-import { MoveAndDeleteControls } from '../Common';
+import { MoveAndUpdateControls } from '../Common/MoveAndUpdateControls';
 import {
   TaskContainer,
   TaskControlsContainer,
@@ -52,7 +52,7 @@ export function Task({
       <TaskTitleRow ref={hoverRef}>
         <TaskTitle>{task.title}</TaskTitle>
         <TaskControlsContainer>
-          <MoveAndDeleteControls
+          <MoveAndUpdateControls
             disableMoveLeft={leftCategoryId == null}
             disableMoveRight={rightCategoryId == null}
             moveLeft={() =>

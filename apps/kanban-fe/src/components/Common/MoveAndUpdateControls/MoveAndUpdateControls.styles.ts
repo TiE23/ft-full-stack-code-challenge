@@ -1,7 +1,7 @@
 import styled, { css } from 'styled-components/macro';
 import { animated } from '@react-spring/web';
 
-import { Percent, Px } from '../../types/styling.types';
+import { Percent, Px } from '../../../types/styling.types';
 
 interface FadeDivProps {
   show: boolean;
