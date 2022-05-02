@@ -1,10 +1,21 @@
+import { useState } from 'react';
 import { useQueryClient } from 'react-query';
+import useHideOnClickOutside from '../../hooks/useHideOnClickOutside';
 
 import TaskMutations from '../../mutations/task.mutations';
 
 import { EntityId, TaskEntity } from '../../types/entity.types';
+import { parseAndPrintDate } from '../../utils/display.utils';
 import { MoveAndDeleteControls } from '../Common';
-import { TaskContainer, TaskTitle, TaskTitleRow } from './Task.styles';
+import {
+  TaskContainer,
+  TaskDate,
+  TaskDatesGrid,
+  TaskExpandedArea,
+  TaskExpandedContent,
+  TaskTitle,
+  TaskTitleRow,
+} from './Task.styles';
 
 export interface TaskProps {
   task: TaskEntity;
@@ -19,6 +30,9 @@ export function Task({
   leftCategoryId,
   rightCategoryId,
 }: TaskProps) {
+  const [expanded, setExpanded, ref] =
+    useHideOnClickOutside<HTMLDivElement>(false);
+
   const queryClient = useQueryClient();
 
   const taskMutations = new TaskMutations(queryClient);
@@ -26,7 +40,9 @@ export function Task({
   return (
     <TaskContainer>
       <TaskTitleRow>
-        <TaskTitle>{task.title}</TaskTitle>
+        <TaskTitle ref={ref} onClick={() => setExpanded(!expanded)}>
+          {task.title}
+        </TaskTitle>
         <MoveAndDeleteControls
           disableMoveLeft={leftCategoryId == null}
           disableMoveRight={rightCategoryId == null}
@@ -54,6 +70,16 @@ export function Task({
           }
         />
       </TaskTitleRow>
+      <TaskExpandedArea expanded={expanded}>
+        <TaskExpandedContent>
+          <TaskDatesGrid>
+            <TaskDate>Updated</TaskDate>
+            <TaskDate>{parseAndPrintDate(task.updated_at)}</TaskDate>
+            <TaskDate>Created</TaskDate>
+            <TaskDate>{parseAndPrintDate(task.created_at)}</TaskDate>
+          </TaskDatesGrid>
+        </TaskExpandedContent>
+      </TaskExpandedArea>
     </TaskContainer>
   );
 }

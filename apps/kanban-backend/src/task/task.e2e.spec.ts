@@ -4,12 +4,12 @@ import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
 import * as supertest from 'supertest';
 
-import { makeDatabase } from '../app/database';
+import { makeDatabase } from '../app/configureDatabase';
 import { CategoryService } from '../category/category.service';
 import { CategoryEntity } from '../category/entities/category.entity';
 import { CategoryModule } from '../category/category.module';
 import { TaskModule } from '../task/task.module';
-import { configureApp } from '../utils/configureApp';
+import { configureApp } from '../app/configureApp';
 import { TaskEntity } from './entities/task.entity';
 
 describe('Task e2e tests', () => {

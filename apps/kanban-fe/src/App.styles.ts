@@ -6,5 +6,5 @@ export const AppContainer = styled.div`
 
   padding: 15px;
 
-  background-color: #3179ba;
+  background-color: ${(p) => p.theme.design.app.bgColor};
 `;

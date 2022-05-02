@@ -9,15 +9,23 @@ export const theme = {
     },
   },
   design: {
+    app: {
+      bgColor: '#3179ba',
+    },
     board: {
+      bgColor: '#c3ceda',
       paddingPx: 15,
       radiusPx: 15,
     },
     category: {
+      bgColor: '#ebecf0',
       widthPx: 300, // Used by multiple components.
       radiusPx: 6,
     },
     task: {
+      bgColor: '#fff',
+      expandedBgColor: '#f7f7f7',
+      fadedTextColor: '#404040',
       radiusPx: 3,
     },
     newEntity: {

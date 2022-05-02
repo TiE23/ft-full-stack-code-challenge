@@ -12,6 +12,6 @@ export const BoardBase = styled.div`
   gap: 20px;
   padding: ${(p) => p.theme.design.board.paddingPx}px;
 
-  background-color: #c3ceda;
+  background-color: ${(p) => p.theme.design.board.bgColor};
   border-radius: ${(p) => p.theme.design.board.radiusPx}px;
 `;

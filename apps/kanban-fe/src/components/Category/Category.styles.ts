@@ -6,7 +6,7 @@ export const CategoryContainer = styled.div`
   flex-grow: 0;
   padding: 0.5rem 1rem 1rem;
 
-  background-color: #ebecf0;
+  background-color: ${(p) => p.theme.design.category.bgColor};
   border-radius: ${(p) => p.theme.design.category.radiusPx}px;
 `;
 
