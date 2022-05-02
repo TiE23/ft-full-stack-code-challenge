@@ -31,6 +31,7 @@ export function Board() {
         <Category
           key={category.id}
           category={category}
+          categoryIndex={index}
           leftCategoryId={categories[index - 1]?.id} // JS is so easy.
           rightCategoryId={categories[index + 1]?.id}
         />

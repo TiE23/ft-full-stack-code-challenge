@@ -10,6 +10,14 @@ export const CategoryContainer = styled.div`
   border-radius: ${(p) => p.theme.design.category.radiusPx}px;
 `;
 
+export const CategoryTitleRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+`;
+
 export const CategoryTitle = styled.div`
   font-weight: bold;
   text-align: center;

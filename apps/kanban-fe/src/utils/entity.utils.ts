@@ -12,7 +12,7 @@ export function createOptimisticCategory(
   newTasks?: TaskEntity[]
 ): CategoryEntity {
   return {
-    title: 'Optimistic Category',
+    title: '...',
     tasks: newTasks || [],
     lexical_order: '',
     id: 0,
@@ -26,7 +26,7 @@ export function createOptimisticTask(
   taskDto: CreateTaskDto | UpdateTaskDto
 ): TaskEntity {
   return {
-    title: 'Optimistic Task',
+    title: '...',
     category: createOptimisticCategory({ title: '' }),
     lexical_order: '',
     id: 0,

@@ -79,3 +79,5 @@ These aren't important to read, they were mostly for myself. This was a learning
 9. I love TypeScript. I swear it makes JavaScript fun. Discriminating unions, when they fit perfect, feel so good.
 10. I have grand plans to add drag-and-drop abilities to the project but for now I'm working on the simple left/right buttons.
 11. I love JavaScript in general. With nullish coalescing you can just throw indicies at an array and if it doesn't exist not only do you not get some exception like you would get in pretty much every other language but you can then check, without fear of error, if a property is available on a particular object in said array.
+12. Lost some time when I forgot which array functions mutated their arrays and which ones did not, requiring me to re-write (and improve greatly) some of the mutations and their optimistic updates.
+13. Oh wow, note to self: In a component don't accidentally write `const queryClient = new QueryClient()` instead of `const queryClient = useQueryClient()`. TypeScript won't save you there, buddy!

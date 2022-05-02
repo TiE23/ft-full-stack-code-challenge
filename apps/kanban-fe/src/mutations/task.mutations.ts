@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash';
 import toast from 'react-hot-toast';
 import { QueryClient, useMutation } from 'react-query';
 
@@ -9,11 +10,20 @@ import {
   moveAndRepositionTaskVariables,
 } from '../api/task.api';
 import { CategoryEntity } from '../types/entity.types';
+import { findObjectAndIndexCloneDeep } from '../utils/common.utils';
 import {
   createOptimisticCategory,
   createOptimisticTask,
 } from '../utils/entity.utils';
 
+/**
+ * Mutations for Tasks.. though, everything updates the 'categories' query in
+ * the end.
+ * All mutations have optimistic updates.
+ * Now, if this isn't the ideal way to do this - if there's something obviously
+ * wrong - please take a grain of mercy on me as this is the first time I've
+ * used react-query. Ever.
+ */
 export default class TaskMutations {
   private queryClient: QueryClient;
   constructor(queryClient: QueryClient) {
@@ -32,28 +42,36 @@ export default class TaskMutations {
       const previousCategories =
         this.queryClient.getQueryData<CategoryEntity[]>('categories');
 
-      const previousCategory = previousCategories?.find(
-        (category) => category.id === categoryId
-      );
-      const optimisticNewTasks = previousCategory
-        ? previousCategory.tasks.filter((task) => task.id !== taskId)
-        : [];
-      const optimisticNewCategory = createOptimisticCategory(
-        { title: previousCategory?.title },
-        optimisticNewTasks
-      );
+      const [targetCategoryIndex, targetCategoryClone] =
+        findObjectAndIndexCloneDeep(
+          (category) => category.id === categoryId,
+          previousCategories
+        );
 
-      this.queryClient.setQueryData<CategoryEntity[]>('categories', (old) => {
-        if (old == null) {
-          return [optimisticNewCategory];
-        } else {
-          return [...old, optimisticNewCategory];
+      if (targetCategoryClone != null) {
+        const optimisticNewTasks = cloneDeep(
+          targetCategoryClone
+            ? targetCategoryClone?.tasks.filter((task) => task.id !== taskId)
+            : []
+        );
+        targetCategoryClone.tasks = optimisticNewTasks;
+      }
+
+      this.queryClient.setQueryData<CategoryEntity[]>(
+        'categories',
+        (oldCategories) => {
+          if (oldCategories != null && targetCategoryClone != null) {
+            const oldCategoriesClone = cloneDeep(oldCategories);
+            oldCategoriesClone[targetCategoryIndex] = targetCategoryClone;
+            return oldCategoriesClone;
+          }
+          return [];
         }
-      });
+      );
 
       return { previousCategories };
     },
-    onError: (err, _newCategory, context) => {
+    onError: (err, _, context) => {
       if (context?.previousCategories) {
         this.queryClient.setQueryData<CategoryEntity[]>(
           'categories',
@@ -61,7 +79,7 @@ export default class TaskMutations {
         );
       }
       toast.error(
-        `An error occurred while adding a new Category${
+        `An error occurred while deleting the Task${
           err ? `\n${String(err)}` : ''
         }`
       );
@@ -91,55 +109,51 @@ export default class TaskMutations {
       const previousCategories =
         this.queryClient.getQueryData<CategoryEntity[]>('categories');
 
-      const previousFromCategoryIndex = previousCategories?.findIndex(
-        (category) => category.id === fromCategoryId
+      const [fromCategoryIndex, fromCategoryClone] =
+        findObjectAndIndexCloneDeep(
+          (category) => category.id === fromCategoryId,
+          previousCategories
+        );
+      const [toCategoryIndex, toCategoryClone] = findObjectAndIndexCloneDeep(
+        (category) => category.id === toCategoryId,
+        previousCategories
       );
-      const previousToCategoryIndex = previousCategories?.findIndex(
-        (category) => category.id === toCategoryId
+      const [targetTaskIndex, targetTaskClone] = findObjectAndIndexCloneDeep(
+        (task) => task.id === taskId,
+        fromCategoryClone?.tasks
       );
-
-      const previousFromCategoryTasks = // JS... this is getting ridiculous.
-        (previousCategories || [])[previousFromCategoryIndex || -1]?.tasks;
-      const previousToCategoryTasks = (previousCategories || [])[
-        previousFromCategoryIndex || -1
-      ]?.tasks;
-
-      const previousTaskIndex = previousFromCategoryTasks.findIndex(
-        (task) => task.id === taskId
-      );
-      const previousTask = previousFromCategoryTasks[previousTaskIndex || -1];
 
       // Move the Task. Remove out of 'from'. Splice/push it into 'to'.
-      if (previousTaskIndex != null && previousTask != null) {
-        previousFromCategoryTasks.splice(previousTaskIndex, 1);
-        if (
-          newPosition < 0 ||
-          newPosition > previousToCategoryTasks.length ||
-          -1
-        ) {
-          previousToCategoryTasks.push(previousTask);
+      if (targetTaskClone != null) {
+        fromCategoryClone?.tasks.splice(targetTaskIndex, 1);
+        if (newPosition < 0) {
+          // Add it to the end if newPosition is -1.
+          toCategoryClone?.tasks.push(targetTaskClone);
         } else {
-          previousToCategoryTasks.splice(newPosition, 0, previousTask);
+          toCategoryClone?.tasks.splice(newPosition, 0, targetTaskClone);
         }
       }
 
-      this.queryClient.setQueryData<CategoryEntity[]>('categories', (old) => {
-        if (
-          old != null &&
-          old[previousFromCategoryIndex || -1] != null &&
-          old[previousToCategoryIndex || -1] != null
-        ) {
-          old[previousFromCategoryIndex || -1].tasks = [];
-          old[previousToCategoryIndex || -1].tasks = [];
-          return old;
-        } else {
+      this.queryClient.setQueryData<CategoryEntity[]>(
+        'categories',
+        (oldCategories) => {
+          if (
+            oldCategories != null &&
+            toCategoryClone != null &&
+            fromCategoryClone != null
+          ) {
+            const oldCategoriesClone = cloneDeep(oldCategories);
+            oldCategoriesClone[fromCategoryIndex] = fromCategoryClone;
+            oldCategoriesClone[toCategoryIndex] = toCategoryClone;
+            return oldCategoriesClone;
+          }
           return [];
         }
-      });
+      );
       return { previousCategories };
     },
     // If the mutation fails, use the context we returned above.
-    onError: (err, _newCategory, context) => {
+    onError: (err, _, context) => {
       if (context?.previousCategories) {
         this.queryClient.setQueryData<CategoryEntity[]>(
           'categories',
@@ -154,8 +168,8 @@ export default class TaskMutations {
     onSettled: () => {
       this.queryClient.invalidateQueries('categories');
     },
-    onSuccess: () => {
-      toast.success(`Task moved!`);
+    onSuccess: (task) => {
+      toast.success(`Task "${task.title}" moved!`);
     },
   });
 
@@ -184,13 +198,15 @@ export default class TaskMutations {
         optimisticNewTasks
       );
 
-      this.queryClient.setQueryData<CategoryEntity[]>('categories', (old) => {
-        if (old == null) {
-          return [optimisticNewCategory];
-        } else {
-          return [...old, optimisticNewCategory];
+      this.queryClient.setQueryData<CategoryEntity[]>(
+        'categories',
+        (oldCategories) => {
+          if (oldCategories == null) {
+            return [optimisticNewCategory];
+          }
+          return [...oldCategories, optimisticNewCategory];
         }
-      });
+      );
 
       return { previousCategories };
     },
@@ -202,7 +218,7 @@ export default class TaskMutations {
         );
       }
       toast.error(
-        `An error occurred while adding a new Category${
+        `An error occurred while creating a new Task${
           err ? `\n${String(err)}` : ''
         }`
       );
@@ -210,9 +226,9 @@ export default class TaskMutations {
     onSettled: () => {
       this.queryClient.invalidateQueries('categories');
     },
-    onSuccess: (data) => {
+    onSuccess: (category) => {
       toast.success(
-        `Task "${data.tasks[data.tasks.length - 1].title}" created!`
+        `Task "${category.tasks[category.tasks.length - 1].title}" created!`
       );
     },
   });

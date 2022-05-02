@@ -1,27 +1,16 @@
 import React, { useState } from 'react';
-import toast from 'react-hot-toast';
-import { useMutation, useQueryClient } from 'react-query';
+import { useQueryClient } from 'react-query';
 
-import {
-  addTask,
-  addTaskVariables,
-  createCategory,
-  createCategoryVariables,
-} from '../../api/category.api';
 import useFocus from '../../hooks/useFocus';
 import CategoryMutations from '../../mutations/category.mutations';
 import TaskMutations from '../../mutations/task.mutations';
 import { EntityType } from '../../types/api.types';
-import { CategoryEntity, EntityId } from '../../types/entity.types';
-import {
-  createOptimisticCategory,
-  createOptimisticTask,
-} from '../../utils/entity.utils';
+import { EntityId } from '../../types/entity.types';
 
 import { NewEntityCreateButton, NewEntityInput } from './NewEntity.styles';
 
 export interface NewEntityFormProps {
-  onSubmit: () => void;
+  onSubmit: VoidFunction;
   entityType: EntityType;
   categoryId?: EntityId;
 }

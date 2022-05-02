@@ -19,7 +19,7 @@ const App = () => {
       <AppContainer>
         <Board />
       </AppContainer>
-      <Toaster />
+      <Toaster position="bottom-right" />
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
