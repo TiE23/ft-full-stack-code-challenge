@@ -27,13 +27,13 @@ export function Board() {
 
   return (
     <BoardBase>
-      {data!.map((category, index, categories) => (
+      {data!.map((category, categoryIndex, categories) => (
         <Category
-          key={category.id}
+          key={`${categoryIndex}_${category.id}`}
           category={category}
-          categoryIndex={index}
-          leftCategoryId={categories[index - 1]?.id} // JS is so easy.
-          rightCategoryId={categories[index + 1]?.id}
+          categoryIndex={categoryIndex}
+          leftCategoryId={categories[categoryIndex - 1]?.id} // JS is so easy.
+          rightCategoryId={categories[categoryIndex + 1]?.id}
         />
       ))}
       <NewEntity entityType={EntityType.CATEGORY} />

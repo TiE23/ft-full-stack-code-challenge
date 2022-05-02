@@ -1,5 +1,7 @@
 import {
   ChevronLeftIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
   ChevronRightIcon,
   DeleteIcon,
   EditIcon,
@@ -20,8 +22,12 @@ import { useEffect, useState } from 'react';
 
 interface MoveAndUpdateControlsProps {
   disableMoveLeft: boolean;
+  disableMoveDown?: boolean;
+  disableMoveUp?: boolean;
   disableMoveRight: boolean;
   moveLeft: VoidFunction;
+  moveDown?: VoidFunction;
+  moveUp?: VoidFunction;
   moveRight: VoidFunction;
   openEdit?: VoidFunction;
   trash: VoidFunction; // Named 'trash' because `delete` is a reserved keyword.
@@ -32,8 +38,12 @@ interface MoveAndUpdateControlsProps {
 
 export function MoveAndUpdateControls({
   disableMoveLeft,
+  disableMoveDown = true,
+  disableMoveUp = true,
   disableMoveRight,
   moveLeft,
+  moveDown,
+  moveUp,
   moveRight,
   openEdit,
   trash,
@@ -103,6 +113,28 @@ export function MoveAndUpdateControls({
                 h={theme.design.controls.iconSizePx}
               />
             </NoStyleButton>
+            {moveDown && (
+              <NoStyleButton
+                disabled={disableMoveDown || disableMove}
+                onClick={moveDown}
+              >
+                <ChevronDownIcon
+                  w={theme.design.controls.iconSizePx}
+                  h={theme.design.controls.iconSizePx}
+                />
+              </NoStyleButton>
+            )}
+            {moveUp && (
+              <NoStyleButton
+                disabled={disableMoveUp || disableMove}
+                onClick={moveUp}
+              >
+                <ChevronUpIcon
+                  w={theme.design.controls.iconSizePx}
+                  h={theme.design.controls.iconSizePx}
+                />
+              </NoStyleButton>
+            )}
             <NoStyleButton
               disabled={disableMoveRight || disableMove}
               onClick={moveRight}

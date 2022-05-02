@@ -1,21 +1,30 @@
 # Kyle's Comments
 
-Hey Jamie and the rest of the Flashtract family! I just wanted to grab this challenge and treat it like a personal project of mine. To, in short amount of time, build it in such a way that I feel would provide a full impression of how I work. I told Jamie that I like to create solutions that aren't just hacks or quick "good-enoughs", so even with just a take-home project I wanted to build it at a professional level... if said professional was trying to speedrun the build of a good app. 😆
+Hey Jamie and the rest of the Flashtract family!
 
-Here's just some of my own notes.
+I just wanted to grab this challenge and treat it like a personal project of mine. To, in a short amount of time, build it in such a way that I feel would provide a full impression of how I can build a webapp.
+
+I told Jamie that I like to create solutions that aren't just hacks or quick "good-enoughs", so even with just a take-home project I wanted to build it at a professional level... if said professional was trying to speedrun the build of a good app. 😆
+
+Be sure to take a look at [my GitHub](https://github.com/TiE23) while you're here!
+
+## Why am I in such a rush?
+
+I have other offers coming in and basically this first week of May might have me saying yes to an offer. So, I want to get my foot in the door with Flashtract as early as possible so I can talk to you all about my work and get you deciding if I would be helpful on the team as early as you can all manage. Otherwise I'd probably wait until late Monday to turn this in.
 
 ## Progress Summary
 
 - On Tueday I was given the assignment and read the general description and little else.
-- On Wednesday I studied up on NestJS, TypeORM, SQLite, and React-Query.
-- On Thursday I started writing the backend. I ran into a lot of friction just trying to get TypeORM to behave within NestJS but by the end of the day I was starting to stretch my legs
+- On Wednesday I studied up on NestJS, TypeORM, SQLite, and React-Query. YouTube! YouTube! YouTube! Official docs, GitHub issues, and Stack Overflow can come later.
+- On Thursday I started writing the backend. I ran into a lot of friction just trying to get TypeORM to behave within NestJS but by the end of the day I was starting to stretch my legs.
 - On Friday I finished the backend and made some design changes. Then started writing unit tests for the backend.
 - On Saturday I spent most of the day figuring out how to correctly run e2e tests for the backend. It was a pretty amazing learning experience to be honest. Discovered in-memory sqlite instances was just a string away. Figured out how to manipulate internal tables to reset auto-increment counts for tables I clear. In general it was a ton of interesting work. I also went back and made some fixes to the backend as I wrote tests and went "oh, right, I didn't consider that case!"
-- On Sunday it was a blitz to the finish in the frontend. Oh man, this was a lot of fun to do quickly.
+- On Sunday it was a blitz to the get as much done in the frontend. Oh man, this was a lot of fun to do quickly.
+- On Monday morning I was just uhhhh... working really hard. But this has been the most in-tune coding wise I've been in recent memory. Real fun hours here.
 
 ## About the Backend
 
-I wrote this app using Node v16.13.0. So, if something goes wrong, please try adjusting your nvm first.
+I wrote this app while using Node v16.13.0. So, if something goes wrong, please try switching to that version.
 
 Knowing what I wanted to build on the frontend I just went whole-hog and dove into 100% exclusively back-end development. Learning to build it with your team's style of using Nest and TypeORM proved to be a real learning experience as I haven't encountered them before. But as a result, I think they both have a new fan (me).
 
@@ -23,7 +32,80 @@ I used Postman (folder config committed to root) for most of my fiddling.
 
 I didn't maybe build the most production-ready solution, and I might've chosen to use params more often than some might like (yes, I will admit that moving and repositioning a Task from one Category to another with an endpoint of `':taskId/moveto/:categoryId/:newPosition'` is maybe weird - I just went with it!), and I chose a fun but weird ordering solution involving "lexical sorting", but I really just had a lot of fun with it.
 
-Oh, and yes, I wrote a full suite of e2e test using a test database. Every Taska and Category endpoint is covered.
+Oh, and yes, I wrote a full suite of e2e test using a test database. Every Task and Category endpoint is covered.
+
+### Things I did; Features, Bonuses, and Stretch Goals
+
+- Stretch: Total e2e testing for all Task and Category endpoints. With a real in-memory DB. Seriously.
+  - Also the e2e tests totally helped me make improvements.
+    - Testing: actually good to do? (???)
+- Feature: Unit testing for Task and Category controllers
+- Feature: Unit testing for business logic
+- Feature: A very novel (read: weird and fun but would **never** make it past the design phase in a realworld situation) ordering solution for Tasks and Categories using a thing called 'lexical ordering'. Literally, it's something I thought up on the toilet and thought it would be fun. 🚽
+- Feature: Took advantage of cascading updates. Tasks are created through a Category directly. Deleting a Category deletes its Tasks as well.
+- Feature: Implemented a special fix using Subscribers to make sure that the `updated_at` column is updated through relationship changes (otherwise they wouldn't)
+- Tech: TypeORM, NestJS, SQLite
+- Bonus: Included my Postman folder
+
+## About the Frontend
+
+First thing I want to point out is that I didn't have the time to combine the Category/Task title editor component (and surrounding state and cache management) into a single shared component to split between Category and Task. I was working so quickly that instead of figuring out how to share them (which I do in NewEntityForm) I essentially just wrote the edit tool for Task and copied the code for Category.
+
+Also this is the first time I've ever used `react-query` so I have a strong hunch I didn't do it the best way possible.
+
+### Things I did; Features, Bonuses, and Stretch Goals
+
+- Bonus: Create, Move, and Rename Categories!
+- Bonus: Rename Tasks (click the title and then click the edit button, press enter to save)
+- Bonus: Change the sorting of Tasks! Up and down. Lots of fun.
+- Strech: Display `created_at` and `updated_at` with decent locale date parsing
+- Bonus: Cool custom hooks
+  - `useFocus()` (auto focus input on mounting)
+  - `useHideOnClickOutside()` (close something by clicking away)
+  - `useHover()` (because :hover isn't cool enough)
+- Thing I did: Styled-Components
+  - I skipped the Chakra UI component library (I already learned so much) and just rolled my own components made with Styled-Components
+  - Used a central theme for some basic consistency
+  - Managed to hit a lot of features of Styled-Components in such a short amount of time
+    - Props
+    - Extending styles
+    - Using themes
+    - Using `css`\`` template strings
+    - Animated with `@react-spring/web`'s `animate()` HOC
+    - Only major thing I can think of that I didn't do is use `.attrs()` anywhere... hmm
+- Bonus: Animated transitions using both CSS and react-spring
+- Bonus: Toasts pop up to confirm successes or explain errors
+- Bonus: I dunno, I just like how much fun I have with TypeScript in general with generics, utility types, disjoint unions
+
+## Stretch goals I didn't get to because I ran into my deadline
+
+I'll probably still do these anyway as time permits this week.
+
+- I didn't add logging to the backend
+- Didn't get to Tags, but I know how I'd go about doing them...
+  - Backend
+    - New Tag and TagsCollection Entities
+    - TagsCollection Controller and Service
+      - ManyToMany relation between both Task and Tag
+      - OneToMany relation from TagsCollection to Tag
+    - Create and Delete Tags from TagsCollection
+    - Add tags by ID to Tasks
+  - Frontend
+    - Adapt the same NewEntity component I have for Tasks and Categories and use them for Tags
+    - In a new section on the screen have a component to display created tags
+    - In the expanded Task component add task checkboxes (this would be simplest)
+      - Handle overflow with scroll bar (not amazing but it'll work)
+    - On the
+    - Besides each tag put a checkbox
+      - Use app state (just react context) to track the checked tags
+      - Filter Tasks on selected tags
+      - Maybe even throw in a toggle switch between `&&` and `||` filtering
+- I didn't get to drag-and-drop
+  - I've totally done this before, in fact, I might just do this even after I email the link in
+- I didn't add, say, an option for Task descriptions
+  - This wouldn't be difficult, only time consuming than slapping another column and updating some endpoints, mutations, and a bunch of types everwhere
+- I did like a single React test (Board.spec.tsx)
+  - Please, I did all of the front end in essentially a single day
 
 ## Daily Notes
 
@@ -84,7 +166,11 @@ These aren't important to read, they were mostly for myself. This was a learning
 14. Had to dive back into the backend to solve an issue where moving a Task between Categories wouldn't update the updated_at column automatically. Found [a solution utilizing Subscribers](https://github.com/typeorm/typeorm/issues/5378#issuecomment-632435566) that was flawed (it caused my e2e tests to fail - woo, thank you e2e tests!) but made the adjustment that was needed and left a comment for future poor souls who run into this issue themselves.
 15. Discovered and fixed a nasty bug involving accidentally ignoring a 0 with `||` when I should've used `??` to detect an undefined property.
 16. Using `react-use-measure` to do some nice fitting to the Task expand transition.
-17. Worked hard on making an elegant solution to incorporate an edit button that shares the same space as the move/delete controls.
-18. It's a lot of fun busting out [`@react-spring/web`](https://react-spring.io/) for the first time in a two months. Use it to transition between edit and move controls so that they can finish transitioning to a fade-out fade out before being dismounted.
-19. Refactoring mutations to be more efficient.
-20. Hey, look at that, with `listenForEnter()` I came across a situation where **function currying** is perfect.
+
+### Monday Notes
+
+1. Worked hard on making an elegant solution to incorporate an edit button that shares the same space as the move/delete controls.
+2. It's a lot of fun busting out [`@react-spring/web`](https://react-spring.io/) for the first time in a two months. Use it to transition between edit and move controls so that they can finish transitioning to a fade-out fade out before being dismounted.
+3. Refactoring mutations to be more efficient.
+4. Hey, look at that, with `listenForEnter()` I came across a situation where **function currying** is perfect.
+5. While I'm bummed I won't get to drag-and-drop today I did go ahead and add Task re-sorting
