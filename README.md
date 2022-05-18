@@ -1,18 +1,61 @@
-# Kyle's Comments on the Full Stack Code Challenge
+# Full Stack Take-Home Challenge
 
-Hey Jamie and the rest of the Flashtract family!
+## Introduction
+
+This was an exceptionally large take-home full stack TypeScript kanban board challenge I did for a small company in Atlanta. I worked on it in a marathon between the afternoon of Thursday April 28th and the morning of Monday May 2nd. I didn't get the job but I feel in my heart I came in second place to whoever did. My code review interview with three engineers included a lot of praise for how dedicated I went about my task.
+
+You can see the original take-home challenge documentation below, but in short I was asked to take an organized but nearly empty back+front-end monorepo that was initialized with [Nx](https://nx.dev/), which was new to me.
 
 I just wanted to grab this challenge and treat it like a personal project of mine. To, in a short amount of time, build it in such a way that I feel would provide a full impression of how I can build a webapp... in a rush.
 
-In our first conversion I told Jamie that I like to create solutions that aren't just hacks or quick "good-enoughs", so even with just a take-home project I wanted to build it at a professional level... if said professional was trying to speedrun the build of a good app.
+### What I was assigned
 
-Anyway, I hope you like my attempt at the challenge. I think I'd have a great time at Flashtract and it's the reason why I decided to put so much effort into this.
+On the backend I was to build a REST API with an actual database backing it. I was directed to use [Nest.js](https://nestjs.com/) (a robust and opinionated evolution of express.js) to handle requests, [TypeORM](https://typeorm.io/) for the framework that negotiates between the business logic and the database, and SQLite3 for the database.
 
-_P.S.: While you're here be sure to take a look at my last experimental personal project I did [on GitHub](https://github.com/TiE23/sab-f1-ui). I think it's pretty interesting._
+On the front-end they suggested [React-Query](https://react-query.tanstack.com/), [Axios](https://axios-http.com/), and [Chakra-UI](https://chakra-ui.com/). I ended up skipping Chakra (except their icons library) and wrote all the styling myself from scratch using [styled-components](https://styled-components.com/).
 
-## Why am I in such a rush?
+The basic example they provided:
 
-I have other offers coming in and basically this first week of May might have me saying yes to an offer. So, I want to get my foot in the door with Flashtract as early as possible so I can talk to you all about my work and get you deciding if I would be helpful on the team as early as you can all manage. Otherwise I'd probably wait until late Monday to turn this in.
+![ezgif-5-0a87dd9f668a.gif](./assets/ezgif-5-0a87dd9f668a.gif)
+
+### What I turned in
+
+My end result (be sure to watch at least the 50 sec mark):
+
+https://user-images.githubusercontent.com/2433505/169069790-2fcfebcc-cea0-4212-9a54-fdd31603fe00.mov
+
+_Except for the toasts that pop up in the corner all styling is original. It's not amazing, but considering I did it in one day I'm pretty content with it._
+
+### What I felt good about
+
+- I never used Nx, NestJS, SQLite3, TypeORM, nor React-Query before... but I learned them all and became a fan
+  - NestJS proved to be a massive headache to write tests for but I learned how to, leaving solution comments on GitHub and Stack Overflow for others
+- I wrote full unit and E2E tests for the backend, including even mocking the database
+- I added optimistic updates to the UI
+  - This wasn't necessary, but I wanted it anyway
+- I added the ability to add, edit, delete, and move Categories
+- I added the ability to sort Tasks
+- I added the ability to edit the names of Tasks and Categories
+- I added an expanding functionality to show additional details for Tasks
+
+https://user-images.githubusercontent.com/2433505/169074567-283d5ce5-fc7d-4b8e-98a7-27bd8a3f2b49.mov
+
+_Unit and e2e tests for the backend._
+
+### What I didn't get to
+
+- Drag-and-drop - I ran out of time (I set myself a deadline of Monday morning), but I've done this before
+- Task tagging - Again, out of time, though this is isn't at all difficult - it just takes time
+
+### This isn't all I can do
+
+I've spent time working within a medium-sized org (Accretive, 5 years) and a gigantic org (Facebook, 2 years). But I've had a lot of fun making stuff on my own. And a great thing about it is I can show them to you!
+
+I've done far more complicated backends with GraphQL [just glance at my API documentation](https://github.com/TiE23/metric-teacher/tree/master/server#graphql-api-documentation) for [Metric-Teacher](http://metric-teacher.com/), a single-page application with user accounts, moderation, user contribution features, and progress tracking.
+
+For the frontend I've had success with Metric-Teacher and, more recently, [building custom tool UIs](https://github.com/TiE23/sab-f1-ui#prototype-interface) and complex [animated elements](https://github.com/TiE23/sab-f1-ui#demos) for my F1 Broadcast Emulator project.
+
+# Project Notes
 
 ## About the Backend
 
@@ -190,13 +233,11 @@ These aren't important to read, they were mostly for myself. This was a learning
 
 <hr/>
 
-# Full Stack Code Challenge
-
-![3aaa3278-5f6e-466d-9dc1-6a6a55d8be4d.png](./assets/3aaa3278-5f6e-466d-9dc1-6a6a55d8be4d.png)
+# Original Full Stack Code Challenge Documentation
 
 ### Goals
 
-This project is designed to show off your capabilities as a Full Stack TS/JS engineer. The Flashtract team will be assessing this project to assist in the determination of team compatibility.
+This project is designed to show off your capabilities as a Full Stack TS/JS engineer. The team will be assessing this project to assist in the determination of team compatibility.
 
 This project aims to exhibit how you approach a problem starting from the high level solution to the low level implementation details and code quality. **You will not be penalized for asking questions, so don't hesitate to ask us if you need any clarification.**
 
