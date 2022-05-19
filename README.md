@@ -20,9 +20,9 @@ The basic example they provided:
 
 ### What I turned in
 
-My end result (be sure to watch at least the 50 sec mark):
+My end result:
 
-https://user-images.githubusercontent.com/2433505/169069790-2fcfebcc-cea0-4212-9a54-fdd31603fe00.mov
+https://user-images.githubusercontent.com/2433505/169326716-bbe00133-78ad-454a-bfc4-71631151e337.mov
 
 _Except for the toasts that pop up in the corner all styling is original. It's not amazing, but considering I did it in one day I'm pretty content with it._
 
